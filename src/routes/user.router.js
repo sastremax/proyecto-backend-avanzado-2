@@ -1,6 +1,7 @@
 import { Router } from 'express';
-import { registerUser, loginUser } from '../controllers/user.controller.js';
+// import { registerUser, loginUser } from '../controllers/user.controller.js';
 import { authorizeAdmin } from '../middlewares/auth.middleware.js';
+import passport from 'passport'
 
 const router = Router();
 
@@ -20,8 +21,17 @@ router.get('/products', authorizeAdmin, (req, res) => {
     res.render('products', { user }) // renderizo la vista de productos con los datos del usuario
 })
 
-router.post('/register', registerUser)
-router.get('/login', loginUser)
+router.post('/register', passport.authenticate('register', {
+    failureRedirect: '/api/users/register', // si falla, vuelve al form
+    successRedirect: '/api/users/login/form' // si registra bien, va al login
+}))
+
+router.post('/login', passport.authenticate('login', {
+    failureRedirect: '/api/users/login/form', // si falla, vuelve al form
+}), (req, res) => {
+    const user = req.user // obtengo el usuario desde la sesión
+    res.redirect(`/api/users/products?name=${user.first_name}&role=${user.role}`)
+})
 
 router.get('/ping', (req, res) => {
     res.send('Pong! Server is working!')

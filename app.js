@@ -5,6 +5,9 @@ import userRouter from './src/routes/user.router.js';
 import { engine } from 'express-handlebars';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import session from 'express-session'; // importo express session
+import passport from 'passport';   // importo passport
+import initializePassport from './src/config/passport.config.js';  // importo mi configuracion personalizada
 
 dotenv.config();
 
@@ -24,6 +27,17 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // rutas
+app.use(session({
+    secret: process.env.SECRET_KEY,  // uso la clavbe secreta del .env
+    resave: false,
+    saveUninitialized: false
+}))
+
+initializePassport(); // inicializo passport
+app.use(passport.initialize());  // activo passport en express
+app.use(passport.session())  // uso passport con sesion
+
+
 app.use('/api/users', userRouter);
 
 // servidor
