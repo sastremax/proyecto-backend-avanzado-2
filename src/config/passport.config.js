@@ -1,6 +1,6 @@
 import passport from 'passport'; // importo passport principal
 import local from 'passport-local'; // importo la estrategia local
-//import GitHubStrategy from 'passport-github2';  // importo la estrategia de GitHub
+import GitHubStrategy from 'passport-github2';  // importo la estrategia de GitHub
 import { UserModel } from '../models/User.model.js';  // importo el modelo de usuario
 import { compareSync, hashSync } from 'bcrypt';  // importo funciones de bcrypt
 
@@ -46,6 +46,29 @@ const initializePassport = () => {
             }
         }
     ))
+
+    passport.use('github', new GitHubStrategy({
+        clientID: process.env.GITHUB_CLIENT_ID, // lo toma del .env
+        clientSecret: process.env.GITHUB_CLIENT_SECRET,
+        callbackURL: 'http://localhost:8084/api/users/githubcallback'
+    }, async (accessToken, refreshToken, profile, done) => {
+        try {
+            const email = profile._json.email || `${profile.username}@github.com` // fallback por si no tiene email público
+            let user = await UserModel.findOne({ email })
+            if (!user) {
+                user = await UserModel.create({
+                    first_name: profile.username,
+                    last_name: 'GitHubUser',
+                    email,
+                    password: '', // sin password porque se loguea por GitHub
+                    role: 'user'
+                })
+            }
+            return done(null, user)
+        } catch (error) {
+            return done(error)
+        }
+    }))
 
     // serializo el usuario en la sesión
     passport.serializeUser((user, done) => {

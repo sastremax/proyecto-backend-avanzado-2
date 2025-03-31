@@ -33,6 +33,17 @@ router.post('/login', passport.authenticate('login', {
     res.redirect(`/api/users/products?name=${user.first_name}&role=${user.role}`)
 })
 
+// inicio del login con GitHub
+router.get('/github', passport.authenticate('github', { scope: ['user:email'] }))
+
+// callback de GitHub luego de autenticar
+router.get('/githubcallback', passport.authenticate('github', {
+    failureRedirect: '/api/users/login/form' // si falla vuelve al formulario
+}), (req, res) => {
+    const user = req.user // obtengo el usuario de la sesión
+    res.redirect(`/api/users/products?name=${user.first_name}&role=${user.role}`) // redirijo igual que en login local
+})
+
 router.get('/ping', (req, res) => {
     res.send('Pong! Server is working!')
 });
