@@ -1,8 +1,8 @@
 export const authorizeAdmin = (req, res, next) => {
-    const { role } = req.query
+    const user = req.user
 
-    if (role !== 'admin') {
+    if (!user || user.role !== 'admin') {
         return res.status(403).send('access denied')
     }
     next()
-}
+};

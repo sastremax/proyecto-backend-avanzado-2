@@ -1,5 +1,4 @@
 import { Router } from 'express';
-// import { registerUser, loginUser } from '../controllers/user.controller.js';
 import { authorizeAdmin } from '../middlewares/auth.middleware.js';
 import passport from 'passport'
 

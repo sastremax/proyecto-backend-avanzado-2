@@ -1,10 +1,15 @@
 import passport from 'passport'; // importo passport principal
 import local from 'passport-local'; // importo la estrategia local
 import GitHubStrategy from 'passport-github2';  // importo la estrategia de GitHub
+import { Strategy as JwtStrategy, ExtractJwt } from 'passport-jwt';   // importo JWT
 import { UserModel } from '../models/User.model.js';  // importo el modelo de usuario
 import { compareSync, hashSync } from 'bcrypt';  // importo funciones de bcrypt
 
 const LocalStrategy = local.Strategy;  // creo una constante para usar la estrategia local
+
+const cookieExtractor = (req) => {
+    return req?.cookies?.jwtToken;
+};
 
 // inicializo todas las estrategias
 const initializePassport = () => {
@@ -29,7 +34,7 @@ const initializePassport = () => {
                 return done(error)
         }
         }
-    ))
+    ));
 
     // estrategia para login
     passport.use('login', new LocalStrategy(
@@ -45,7 +50,7 @@ const initializePassport = () => {
                 return done(error)
             }
         }
-    ))
+    ));
 
     passport.use('github', new GitHubStrategy({
         clientID: process.env.GITHUB_CLIENT_ID, // lo toma del .env
@@ -68,7 +73,23 @@ const initializePassport = () => {
         } catch (error) {
             return done(error)
         }
-    }))
+    }));
+
+    passport.use('current', new JwtStrategy(
+        {
+            jwtFromRequest: ExtractJwt.fromExtractors([cookieExtractor]),
+            secretOrKey: process.env.JWT_SECRET
+        },
+        async (jwtPayload, done) => {
+            try {
+                const user = await UserModel.findById(jwtPayload.id);
+                if (!user) return done(null, false);
+                return done(null, user);
+            } catch (error) {
+                return done(error);
+            }
+        }
+    ));
 
     // serializo el usuario en la sesión
     passport.serializeUser((user, done) => {
@@ -79,7 +100,7 @@ const initializePassport = () => {
     passport.deserializeUser(async (id, done) => {
         const user = await UserModel.findById(id)
         done(null, user)
-    })
-}
+    });    
+};
 
 export default initializePassport

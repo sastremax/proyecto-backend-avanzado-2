@@ -8,6 +8,7 @@ import { fileURLToPath } from 'url';
 import session from 'express-session'; // importo express session
 import passport from 'passport';   // importo passport
 import initializePassport from './src/config/passport.config.js';  // importo mi configuracion personalizada
+import sessionRouter from './src/routes/session.router.js';
 
 dotenv.config();
 
@@ -26,6 +27,9 @@ app.set('views', path.join(__dirname, 'src', 'views'))
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// lectura de cookies
+app.use(cookieParser());
+
 // rutas
 app.use(session({
     secret: process.env.SECRET_KEY,  // uso la clavbe secreta del .env
@@ -39,6 +43,7 @@ app.use(passport.session())  // uso passport con sesion
 
 
 app.use('/api/users', userRouter);
+app.use('/api/sessions', sessionRouter);
 
 // servidor
 const startServer = async () => {

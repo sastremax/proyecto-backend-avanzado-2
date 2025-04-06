@@ -1,43 +1,62 @@
 import { UserModel } from '../models/User.model.js';
-import bcrypt from 'bcrypt';
+import { hashPassword } from '../utils/hash.js';  
 
 // REGISTRO UN USUARIO
 export const registerUser = async (req, res) => {
     try {
-        const { first_name, last_name, email, password } = req.body // obtengo los datos del body
+        const { first_name, last_name, email, age, password } = req.body // obtengo los datos del body
 
-        const userExists = await UserModel.findOne({ email }) // verifico si ya existe ese email
-        if (userExists) return res.status(400).send('User already exists') // si existe, devuelvo error
+        const existingUser = await UserModel.findOne({ email }) // verifico si ya existe ese email
+        if (existingUser) {
+            return res.status(400).json({ message: 'User already exists' }); // si existe, devuelvo error
+        }
 
-        const hashedPassword = await bcrypt.hash(password, 10) // hasheo la contraseña
-
-        const newUser = await UserModel.create({
+        const newUser = new UserModel({
             first_name,
             last_name,
             email,
-            password: hashedPassword, // guardo la contraseña hasheada
-            role: email === 'adminCoder@coder.com' ? 'admin' : 'user' // asigno rol según el correo
-        })
+            age,
+            password: hashPassword(password)
+        });
 
-        res.status(201).send(`User ${newUser.email} created`) // confirmo que se creó el usuario
+        await newUser.save();
+
+        res.status(201).json({ message: 'User registered successfully' }) 
     } catch (error) {
-        res.status(500).send('Server error') // devuelvo error general si algo falla
+        res.status(500).json({ message: 'Internal server error' })
     }
-}
+};
 
 export const loginUser = async (req, res) => {
     try {
-        const { email, password } = req.query // obtengo email y password 
+        const { email, password } = req.body // obtengo email y password 
 
         const user = await UserModel.findOne({ email }) // busco el usuario por email
 
-        if (!user) return res.status(401).send('User not found') // si no existe devuelvo error 401
+        if (!user) return res.status(401).send('User not found'); // si no existe devuelvo error 401
 
         const isMatch = await bcrypt.compare(password, user.password) // comparo contraseña ingresada con la guardada
 
         if (!isMatch) return res.status(401).send('Invalid credentials') // si no coincide, devuelvo error
 
-        res.redirect(`/api/users/products?name=${user.first_name}&role=${user.role}`) // redirijo a la vista de productos con datos por query
+        const token = jwt.sign(
+            {
+                id: user._id,
+                email: user.email,
+                role: user.role,
+                name: user.first_name
+            },
+            process.env.JWT_SECRET,
+            { expiresIn: '1h' }
+        );
+
+        res.cookie('jwtToken', token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            maxAge: 3600000
+        });
+
+        res.status(200).send('Login successful');
     } catch (error) {
         res.status(500).send('Login failed') // muestro error general
     }

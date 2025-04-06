@@ -5,7 +5,9 @@ const userSchema = new mongoose.Schema({
     first_name: { type: String, required: true }, // defino el campo nombre
     last_name: { type: String, required: true }, // defino el campo apellido
     email: { type: String, required: true, unique: true }, // defino el campo email como único
-    password: { type: String },
+    age: { type: Number, required: true },  // defino el campo edad como obligatorio
+    password: { type: String },  // defino el campo contraseña
+    cart: { type: mongoose.Schema.Types.ObjectId, ref: 'Carts' }, // campo carrito lo junto con el modelo de carts
     role: { type: String, default: 'user' } // defino el campo rol, por defecto será "user"
 })
 
