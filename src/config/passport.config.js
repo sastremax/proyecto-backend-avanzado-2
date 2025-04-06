@@ -68,7 +68,7 @@ const initializePassport = () => {
                     last_name: 'GitHubUser',
                     email,
                     password: '', // sin password porque se loguea por GitHub
-                    role: 'user'
+                    role: profile.username === 'sastremax' ? 'admin' : 'user'
                 });
             }
             return done(null, user)

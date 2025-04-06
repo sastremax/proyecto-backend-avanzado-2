@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { authorizeAdmin } from '../middlewares/auth.middleware.js';
 import passport from 'passport';
 import { auth } from '../middlewares/auth.js';
+import jwt from 'jsonwebtoken';
 
 const router = Router();
 
@@ -27,12 +28,16 @@ router.get('/products',
 );
 
 // inicio del login con GitHub
-router.get('/github', passport.authenticate('github', { scope: ['user:email'] }))
+router.get('/github', passport.authenticate('github', { scope: ['user:email'] }));
 
 // callback de GitHub luego de autenticar
 router.get('/githubcallback', passport.authenticate('github', {
-    failureRedirect: '/api/users/login/form' // si falla vuelve al formulario
-}), (req, res) => {    
+    failureRedirect: '/api/users/login/form', // si falla vuelve al formulario
+    session: false
+}), (req, res) => { 
+    const user = req.user;
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    res.cookie('jwtToken', token, { httpOnly: true });   
     res.redirect(`/api/users/products`);
 });
 
