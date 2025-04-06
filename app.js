@@ -29,6 +29,7 @@ const __filename = fileURLToPath(import.meta.url) // obtengo la ruta del archivo
 const __dirname = path.dirname(__filename) // simulo __dirname como en CommonJS
 
 app.set('views', path.join(__dirname, 'src', 'views'))
+app.use(express.static(path.join(__dirname, 'src', 'public')));
 
 // middlewares
 app.use(express.json());
