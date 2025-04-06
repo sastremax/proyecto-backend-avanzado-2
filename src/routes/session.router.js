@@ -32,11 +32,13 @@ router.post('/login', (req, res, next) => {
 });
 
 // registro
-router.post('/register', passport.authenticate('register', {
-    session: false,
-    failureRedirect: '/api/users/register'
-}), (req, res) => {
-    res.status(201).json({ message: 'User registered successfully' });
+router.post('/register', (req, res, next) => {
+    passport.authenticate('register', { session: false }, (err, user, info) => {
+        if (err) return next(err);
+        if (!user) return res.status(400).json({ error: 'User already exists or invalid data' });
+
+        res.status(201).json({ message: 'User registered successfully' });
+    })(req, res, next);
 });
 
 // current

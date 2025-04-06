@@ -36,7 +36,8 @@ app.use(cookieParser());
 app.use(session({
     secret: process.env.SECRET_KEY,  // uso la clavbe secreta del .env
     resave: false,
-    saveUninitialized: false
+    saveUninitialized: false,
+    cookie: { secure: false }
 }))
 
 initializePassport(); // inicializo passport

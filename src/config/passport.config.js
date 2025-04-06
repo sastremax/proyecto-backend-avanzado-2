@@ -18,7 +18,7 @@ const initializePassport = () => {
         { passReqToCallback: true, usernameField: 'email' },
         async (req, email, password, done) => {
             try {
-                const { first_name, last_name } = req.body // obtengo los datos del body
+                const { first_name, last_name, age } = req.body // obtengo los datos del body
                 const exists = await UserModel.findOne({ email }) // busco si el usuario ya estite
                 if (exists) return done(null, false) // si existe, corto el registro
                 const hashedPassword = hashPassword(password); // hasheo la contraseña
@@ -27,6 +27,7 @@ const initializePassport = () => {
                     last_name,
                     email,
                     password: hashedPassword,
+                    age,
                     role: email === 'adminCoder@coder.com' ? 'admin' : 'user' // asigno el rol según el correo
                 })
                 return done(null, user); // devuelvo el usuario
