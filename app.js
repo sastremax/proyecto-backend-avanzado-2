@@ -18,7 +18,12 @@ const app = express()
 const PORT = process.env.PORT || 8084
 
 // configuro handlebars como motor de plantillas
-app.engine('handlebars', engine())
+app.engine('handlebars', engine({
+    runtimeOptions: {
+        allowProtoPropertiesByDefault: true,
+        allowProtoMethodsByDefault: true
+    }
+}))
 app.set('view engine', 'handlebars')
 const __filename = fileURLToPath(import.meta.url) // obtengo la ruta del archivo actual
 const __dirname = path.dirname(__filename) // simulo __dirname como en CommonJS

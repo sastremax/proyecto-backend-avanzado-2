@@ -21,6 +21,7 @@ router.get('/products',
     authorizeAdmin,
     (req, res) => {
         const user = req.user // uso el usuario autenticado
+        console.log(req.user)
         res.render('products', { user }); // renderizo la vista de productos con los datos del usuario
     }
 );
