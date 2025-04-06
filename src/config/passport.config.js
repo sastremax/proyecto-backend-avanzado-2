@@ -3,7 +3,7 @@ import local from 'passport-local'; // importo la estrategia local
 import GitHubStrategy from 'passport-github2';  // importo la estrategia de GitHub
 import { Strategy as JwtStrategy, ExtractJwt } from 'passport-jwt';   // importo JWT
 import { UserModel } from '../models/User.model.js';  // importo el modelo de usuario
-import { compareSync, hashSync } from 'bcrypt';  // importo funciones de bcrypt
+import { hashPassword, isValidPassword } from '../utils/hash.js';
 
 const LocalStrategy = local.Strategy;  // creo una constante para usar la estrategia local
 
@@ -21,7 +21,7 @@ const initializePassport = () => {
                 const { first_name, last_name } = req.body // obtengo los datos del body
                 const exists = await UserModel.findOne({ email }) // busco si el usuario ya estite
                 if (exists) return done(null, false) // si existe, corto el registro
-                const hashedPassword = hashSync(password, 10) // hasheo la contraseña
+                const hashedPassword = hashPassword(password); // hasheo la contraseña
                 const user = await UserModel.create({
                     first_name,
                     last_name,
@@ -29,10 +29,10 @@ const initializePassport = () => {
                     password: hashedPassword,
                     role: email === 'adminCoder@coder.com' ? 'admin' : 'user' // asigno el rol según el correo
                 })
-                return done(null, user) // devuelvo el usuario
+                return done(null, user); // devuelvo el usuario
             } catch (error) {
                 return done(error)
-        }
+            }
         }
     ));
 
@@ -43,7 +43,7 @@ const initializePassport = () => {
             try {
                 const user = await UserModel.findOne({ email })
                 if (!user) return done(null, false) // si no existe, corto
-                const valid = compareSync(password, user.password)
+                const valid = isValidPassword(password, user.password);
                 if (!valid) return done(null, false) // si la contraseña no coincide, corto
                 return done(null, user) // si está bien, devuelvo el usuario
             } catch (error) {
@@ -52,6 +52,7 @@ const initializePassport = () => {
         }
     ));
 
+    // estrategia GitHub
     passport.use('github', new GitHubStrategy({
         clientID: process.env.GITHUB_CLIENT_ID, // lo toma del .env
         clientSecret: process.env.GITHUB_CLIENT_SECRET,
@@ -67,7 +68,7 @@ const initializePassport = () => {
                     email,
                     password: '', // sin password porque se loguea por GitHub
                     role: 'user'
-                })
+                });
             }
             return done(null, user)
         } catch (error) {
@@ -75,6 +76,7 @@ const initializePassport = () => {
         }
     }));
 
+    // estrategia JWT para extraer usuario desde cookie
     passport.use('current', new JwtStrategy(
         {
             jwtFromRequest: ExtractJwt.fromExtractors([cookieExtractor]),
@@ -90,17 +92,6 @@ const initializePassport = () => {
             }
         }
     ));
-
-    // serializo el usuario en la sesión
-    passport.serializeUser((user, done) => {
-        done(null, user._id)
-    })
-    
-    // deserializo para recuperar los datos del usuario en cada request
-    passport.deserializeUser(async (id, done) => {
-        const user = await UserModel.findById(id)
-        done(null, user)
-    });    
 };
 
 export default initializePassport

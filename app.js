@@ -1,6 +1,7 @@
 import express from 'express';
 import { connectToDB } from './src/config/db.js';
 import dotenv from 'dotenv';
+import cookieParser from 'cookie-parser';
 import userRouter from './src/routes/user.router.js';
 import { engine } from 'express-handlebars';
 import path from 'path';
@@ -9,6 +10,7 @@ import session from 'express-session'; // importo express session
 import passport from 'passport';   // importo passport
 import initializePassport from './src/config/passport.config.js';  // importo mi configuracion personalizada
 import sessionRouter from './src/routes/session.router.js';
+
 
 dotenv.config();
 
