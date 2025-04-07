@@ -2,8 +2,10 @@ import passport from 'passport'; // importo passport principal
 import local from 'passport-local'; // importo la estrategia local
 import GitHubStrategy from 'passport-github2';  // importo la estrategia de GitHub
 import { Strategy as JwtStrategy, ExtractJwt } from 'passport-jwt';   // importo JWT
-import { UserModel } from '../models/User.model.js';  // importo el modelo de usuario
+import { UserManager } from '../dao/mongo/UserManager.js';  // importo el modelo de usuario desde dao
 import { hashPassword, isValidPassword } from '../utils/hash.js';
+
+const userManager = new UserManager();
 
 const LocalStrategy = local.Strategy;  // creo una constante para usar la estrategia local
 
@@ -19,12 +21,12 @@ const initializePassport = () => {
         async (req, email, password, done) => {
             try {
                 const { first_name, last_name, age } = req.body // obtengo los datos del body
-                const exists = await UserModel.findOne({ email }) // busco si el usuario ya estite
+                const exists = await userManager.getByEmail(email) // busco si el usuario ya estite
                 if (exists) {
                     return done(null, false, { message: 'User already exists' });
                 }
                     const hashedPassword = hashPassword(password); // hasheo la contraseña
-                const user = await UserModel.create({
+                const user = await userManager.createUser({
                     first_name,
                     last_name,
                     email,
@@ -44,7 +46,7 @@ const initializePassport = () => {
         { usernameField: 'email' },
         async (email, password, done) => {
             try {
-                const user = await UserModel.findOne({ email })
+                const user = await userManager.getByEmail(email)
                 if (!user) {
                     return done(null, false, { message: 'User not found' });
                 }
@@ -67,9 +69,9 @@ const initializePassport = () => {
     }, async (accessToken, refreshToken, profile, done) => {
         try {
             const email = profile._json.email || `${profile.username}@github.com` // fallback por si no tiene email público
-            let user = await UserModel.findOne({ email })
+            let user = await userManager.getByEmail(email);
             if (!user) {
-                user = await UserModel.create({
+                user = await userManager.createUser({
                     first_name: profile.username,
                     last_name: 'GitHubUser',
                     email,
@@ -91,7 +93,7 @@ const initializePassport = () => {
         },
         async (jwtPayload, done) => {
             try {
-                const user = await UserModel.findById(jwtPayload.id);
+                const user = await userManager.getById(jwtPayload.id);
                 if (!user) return done(null, false, { message: 'User not found' });
                 return done(null, user);
             } catch (error) {
