@@ -21,6 +21,24 @@ const initializePassport = () => {
         async (req, email, password, done) => {
             try {
                 const { first_name, last_name, age } = req.body // obtengo los datos del body
+                
+                // validaciones personalizadas
+                if (!first_name || !last_name || !email || !password || !age) {
+                    return done(null, false, { message: 'All fields are required' });
+                }
+
+                if (!email.includes('@')) {
+                    return done(null, false, { message: 'Invalid email format' });
+                }
+
+                if (password.length < 6) {
+                    return done(null, false, { message: 'Password must be at least 6 characters' });
+                }
+
+                if (isNaN(age) || age <= 0) {
+                    return done(null, false, { message: 'Invalid age' });
+                }
+                
                 const exists = await userManager.getByEmail(email) // busco si el usuario ya estite
                 if (exists) {
                     return done(null, false, { message: 'User already exists' });
