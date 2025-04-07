@@ -38,7 +38,7 @@ router.get('/githubcallback', passport.authenticate('github', {
     const user = req.user;
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
     res.cookie('jwtToken', token, { httpOnly: true });   
-    res.redirect(`/api/users/products`);
+    res.redirect(`/api/users/products?from=github`);
 });
 
 // test de ping

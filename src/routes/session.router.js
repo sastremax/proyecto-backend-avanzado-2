@@ -12,8 +12,10 @@ const router = Router();
 router.post('/login', (req, res, next) => {
     passport.authenticate('login', { session: false }, (err, user, info) => {
         if (err) return next(err);
-        if (!user) return res.status(401).json({ error: 'Invalid credentials' });
-
+        if (!user) {
+            return res.status(401).json({ error: info ?.message || 'Login failed'  })
+        }
+        
         const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
         res.cookie('jwtToken', token, { httpOnly: true });
@@ -35,7 +37,7 @@ router.post('/login', (req, res, next) => {
 router.post('/register', (req, res, next) => {
     passport.authenticate('register', { session: false }, (err, user, info) => {
         if (err) return next(err);
-        if (!user) return res.status(400).json({ error: 'User already exists or invalid data' });
+        if (!user) return res.status(400).json({ error: info?.message });
 
         res.status(201).json({ message: 'User registered successfully' });
     })(req, res, next);

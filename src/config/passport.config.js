@@ -20,8 +20,10 @@ const initializePassport = () => {
             try {
                 const { first_name, last_name, age } = req.body // obtengo los datos del body
                 const exists = await UserModel.findOne({ email }) // busco si el usuario ya estite
-                if (exists) return done(null, false) // si existe, corto el registro
-                const hashedPassword = hashPassword(password); // hasheo la contraseña
+                if (exists) {
+                    return done(null, false, { message: 'User already exists' });
+                }
+                    const hashedPassword = hashPassword(password); // hasheo la contraseña
                 const user = await UserModel.create({
                     first_name,
                     last_name,
@@ -43,10 +45,14 @@ const initializePassport = () => {
         async (email, password, done) => {
             try {
                 const user = await UserModel.findOne({ email })
-                if (!user) return done(null, false) // si no existe, corto
-                const valid = isValidPassword(password, user.password);
-                if (!valid) return done(null, false) // si la contraseña no coincide, corto
-                return done(null, user) // si está bien, devuelvo el usuario
+                if (!user) {
+                    return done(null, false, { message: 'User not found' });
+                }
+                    const valid = isValidPassword(password, user.password);
+                if (!valid) {
+                    return done(null, false, { message: 'Incorrect password' });
+                }
+                    return done(null, user) // si está bien, devuelvo el usuario
             } catch (error) {
                 return done(error)
             }
@@ -86,7 +92,7 @@ const initializePassport = () => {
         async (jwtPayload, done) => {
             try {
                 const user = await UserModel.findById(jwtPayload.id);
-                if (!user) return done(null, false);
+                if (!user) return done(null, false, { message: 'User not found' });
                 return done(null, user);
             } catch (error) {
                 return done(error);
