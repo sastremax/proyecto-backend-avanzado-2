@@ -1,8 +1,18 @@
-export const authorizeAdmin = (req, res, next) => {
-    const user = req.user
+export const authorizationRol = (rol = "") => {
+    return (req, res, next) => {
 
-    if (!user || user.role !== 'admin') {
-        return res.status(403).send('access denied')
-    }
-    next()
+        if (!req.user) {
+            res.setHeader();
+            return res.status(401).json({ error: 'Unauthorized access' });
+        }
+
+        if (rol.toLowerCase() === 'public' || role.length === 0) return next(); 
+
+        if (req.user.role !== role) {
+            res.setHeader('Content-Type', 'application/json');
+            return res.status(403).json({ error: 'Insufficient privileges to access this resource' });
+        }
+
+        next();
+    };
 };

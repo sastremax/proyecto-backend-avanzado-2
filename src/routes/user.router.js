@@ -1,7 +1,6 @@
 import { Router } from 'express';
-import { authorizeAdmin } from '../middlewares/auth.middleware.js';
+import { authorizationRol } from '../middlewares/auth.middleware.js';
 import passport from 'passport';
-import { auth } from '../middlewares/auth.js';
 import jwt from 'jsonwebtoken';
 
 const router = Router();
@@ -18,8 +17,7 @@ router.get('/register', (req, res) => {
 
 router.get('/products', 
     passport.authenticate('current', { session: false }),
-    auth,
-    authorizeAdmin,
+    authorizationRol('admin'),
     (req, res) => {
         const user = req.user // uso el usuario autenticado
         console.log(req.user)

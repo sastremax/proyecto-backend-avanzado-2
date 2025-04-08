@@ -2,7 +2,7 @@ import { Router } from 'express';
 import passport from 'passport';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
-import { auth } from '../middlewares/auth.js';
+import { authorizationRol } from '../middlewares/auth.middleware.js';
 
 dotenv.config();
 
@@ -44,12 +44,15 @@ router.post('/register', (req, res, next) => {
 });
 
 // current
-router.get('/current', passport.authenticate('current', { session: false }), auth, (req, res) => {
-    res.status(200).json({
-        status: 'success',
-        user: req.user
-    });
-});
+router.get('/current', passport.authenticate('current', { session: false }),
+    authorizationRol(), 
+    (req, res) => {
+        res.status(200).json({
+            status: 'success',
+            user: req.user
+        });
+    } 
+);
 
 // logout
 router.get('/logout', (req, res) => {

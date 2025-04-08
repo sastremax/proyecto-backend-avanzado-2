@@ -98,7 +98,7 @@ Elimina la cookie y cierra sesión
 
 Ruta: GET /api/users/products
 
-Protegida por passport.authenticate('current'), auth y authorizeAdmin
+Protegida por passport.authenticate('current') y authorizationRol('admin').
 
 Renderiza products.handlebars con los datos del usuario
 
@@ -110,9 +110,9 @@ GET /api/users/register → Vista para registrarse
 
 Middleware Aplicados
 
-auth.js → Verifica JWT presente en cookies
+passport.authenticate('current') → Verifica el token JWT desde  cookies
 
-authorizeAdmin.js → Permite acceso solo a usuarios con rol admin
+authorizationRol(rol) → Verifica si el usuario tiene el rol requerido (por defecto cualquier rol)
 
 Pruebas
 
