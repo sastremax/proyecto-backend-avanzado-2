@@ -4,13 +4,13 @@ import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
 import userRouter from './src/routes/user.router.js';
 import { engine } from 'express-handlebars';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import session from 'express-session'; // importo express session
-import passport from 'passport';   // importo passport
-import initializePassport from './src/config/passport.config.js';  // importo mi configuracion personalizada
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import session from 'express-session'; 
+import passport from 'passport';   
+import initializePassport from './src/config/passport.config.js';
 import sessionRouter from './src/routes/session.router.js';
-
+import BaseRouter from './src/routes/base.router.js';
 
 dotenv.config();
 
@@ -25,8 +25,8 @@ app.engine('handlebars', engine({
     }
 }))
 app.set('view engine', 'handlebars')
-const __filename = fileURLToPath(import.meta.url) // obtengo la ruta del archivo actual
-const __dirname = path.dirname(__filename) // simulo __dirname como en CommonJS
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 
 app.set('views', path.join(__dirname, 'src', 'views'))
 app.use(express.static(path.join(__dirname, 'src', 'public')));
@@ -40,19 +40,20 @@ app.use(cookieParser());
 
 // rutas
 app.use(session({
-    secret: process.env.SECRET_KEY,  // uso la clavbe secreta del .env
+    secret: process.env.SECRET_KEY, 
     resave: false,
     saveUninitialized: false,
     cookie: { secure: false }
 }))
 
-initializePassport(); // inicializo passport
-app.use(passport.initialize());  // activo passport en express
-app.use(passport.session())  // uso passport con sesion
+initializePassport();
+app.use(passport.initialize());
+app.use(passport.session())
 
 
 app.use('/api/users', userRouter);
 app.use('/api/sessions', sessionRouter);
+app.use('/base', new BaseRouter().getRouter());
 
 // servidor
 const startServer = async () => {

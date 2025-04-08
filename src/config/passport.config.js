@@ -35,7 +35,7 @@ const initializePassport = () => {
                     return done(null, false, { message: 'Password must be at least 6 characters' });
                 }
 
-                if (isNaN(age) || age <= 0) {
+                if (Number.isNaN(age) || age <= 0) {
                     return done(null, false, { message: 'Invalid age' });
                 }
                 
