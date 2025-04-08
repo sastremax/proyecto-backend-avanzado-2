@@ -50,7 +50,7 @@ const initializePassport = () => {
                     email,
                     password: hashedPassword,
                     age,
-                    role: email === 'adminCoder@coder.com' ? 'admin' : 'user' // asigno el rol según el correo
+                    role: email === 'adminCoder@coder.com' ? 'admin' : 'user' // asigno el role según el correo
                 })
                 return done(null, user); // devuelvo el usuario
             } catch (error) {
