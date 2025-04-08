@@ -20,7 +20,7 @@ export default class CustomRouter {
     }
 
     #generateCustomResponses(req, res, next) {
-        res.succes = (message, data = {}) => {
+        res.success = (message, data = {}) => {
             res.status(200).json({ status: 'success', message, data });
         }
 
