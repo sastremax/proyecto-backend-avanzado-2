@@ -32,7 +32,7 @@ export default class SessionsRouter extends CustomRouter {
                 if (err) return next(err);
                 if (!user) return res.badRequest(info?.message);
 
-                res.success('User registered successfully');
+                res.created('User registered successfully');
             })(req, res, next);
         });
 

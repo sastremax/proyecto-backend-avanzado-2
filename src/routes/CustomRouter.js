@@ -24,6 +24,14 @@ export default class CustomRouter {
             res.status(200).json({ status: 'success', message, data });
         }
 
+        res.created = (message, data = {}) => {
+            res.status(201).json({ status: 'success', message, data });
+        };
+
+        res.noContent = () => {
+            res.status(204).send();
+        };
+
         res.badRequest = (error) => {
             res.status(400).json({ status: 'error', error });
         };
@@ -36,6 +44,10 @@ export default class CustomRouter {
             res.status(403).json({ status: 'error', error });
         };
 
+        res.conflict = (error) => {
+            res.status(409).json({ status: 'error', error });
+        };
+        
         res.internalError = (error) => {
             res.status(500).json({ status: 'error', error });
         };
