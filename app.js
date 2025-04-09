@@ -2,7 +2,6 @@ import express from 'express';
 import { connectToDB } from './src/config/db.js';
 import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
-import userRouter from './src/routes/user.router.js';
 import { engine } from 'express-handlebars';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -11,6 +10,7 @@ import passport from 'passport';
 import initializePassport from './src/config/passport.config.js';
 import sessionRouter from './src/routes/session.router.js';
 import BaseRouter from './src/routes/base.router.js';
+import UsersRouter from './src/router/users.router.js';
 
 dotenv.config();
 
@@ -50,8 +50,7 @@ initializePassport();
 app.use(passport.initialize());
 app.use(passport.session())
 
-
-app.use('/api/users', userRouter);
+app.use('/api/users', new UsersRouter().getRouter());
 app.use('/api/sessions', sessionRouter);
 app.use('/base', new BaseRouter().getRouter());
 
