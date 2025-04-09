@@ -8,7 +8,7 @@ import { fileURLToPath } from 'node:url';
 import session from 'express-session'; 
 import passport from 'passport';   
 import initializePassport from './src/config/passport.config.js';
-import sessionRouter from './src/routes/session.router.js';
+import sessionRouter from './src/routes/sessions.router.js';
 import BaseRouter from './src/routes/base.router.js';
 import UsersRouter from './src/router/users.router.js';
 
