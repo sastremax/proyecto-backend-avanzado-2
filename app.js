@@ -8,7 +8,7 @@ import { fileURLToPath } from 'node:url';
 import session from 'express-session'; 
 import passport from 'passport';   
 import initializePassport from './src/config/passport.config.js';
-import sessionRouter from './src/routes/sessions.router.js';
+import SessionsRouter from './src/routes/sessions.router.js';
 import BaseRouter from './src/routes/base.router.js';
 import UsersRouter from './src/routes/users.router.js';
 
@@ -51,7 +51,7 @@ app.use(passport.initialize());
 app.use(passport.session())
 
 app.use('/api/users', new UsersRouter().getRouter());
-app.use('/api/sessions', sessionRouter);
+app.use('/api/sessions', new SessionsRouter().getRouter());
 app.use('/base', new BaseRouter().getRouter());
 
 // servidor
