@@ -13,6 +13,7 @@ import BaseRouter from './routes/base.router.js';
 import UsersRouter from './routes/users.router.js';
 import ProductsRouter from './routes/products.router.js';
 import CartsRouter from './routes/carts.router.js';
+import ViewsRouter from './routes/views.router.js';
 
 dotenv.config();
 
@@ -56,6 +57,7 @@ app.use('/api/users', new UsersRouter().getRouter());
 app.use('/api/sessions', new SessionsRouter().getRouter());
 app.use('/api/products', new ProductsRouter().getRouter());
 app.use('/api/carts', new CartsRouter().getRouter());
+app.use('/views', new ViewsRouter().getRouter());
 app.use('/base', new BaseRouter().getRouter());
 
 // servidor
