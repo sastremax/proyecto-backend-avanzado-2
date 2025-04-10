@@ -59,6 +59,9 @@ app.use('/api/products', new ProductsRouter().getRouter());
 app.use('/api/carts', new CartsRouter().getRouter());
 app.use('/views', new ViewsRouter().getRouter());
 app.use('/base', new BaseRouter().getRouter());
+app.get('/', (req, res) => {
+    res.redirect('/views/products/view');
+});
 
 // servidor
 const startServer = async () => {

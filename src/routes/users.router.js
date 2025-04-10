@@ -39,7 +39,7 @@ export default class UsersRouter extends CustomRouter {
                 try {
                     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
                     res.cookie('jwtToken', token, { httpOnly: true });
-                    res.redirect('/api/users/products?from=github');
+                    res.redirect('/views/products/view');
                 } catch (error) {
                     res.internalError('GitHub login error');
                 }
