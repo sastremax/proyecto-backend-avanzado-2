@@ -1,5 +1,5 @@
 import express from 'express';
-import { connectToDB } from './src/config/db.js';
+import { connectToDB } from './config/db.js';
 import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
 import { engine } from 'express-handlebars';
@@ -7,10 +7,10 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import session from 'express-session'; 
 import passport from 'passport';   
-import initializePassport from './src/config/passport.config.js';
-import SessionsRouter from './src/routes/sessions.router.js';
-import BaseRouter from './src/routes/base.router.js';
-import UsersRouter from './src/routes/users.router.js';
+import initializePassport from './config/passport.config.js';
+import SessionsRouter from './routes/sessions.router.js';
+import BaseRouter from './routes/base.router.js';
+import UsersRouter from './routes/users.router.js';
 
 dotenv.config();
 
@@ -28,8 +28,8 @@ app.set('view engine', 'handlebars')
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
-app.set('views', path.join(__dirname, 'src', 'views'))
-app.use(express.static(path.join(__dirname, 'src', 'public')));
+app.set('views', path.join(__dirname, 'views'))
+app.use(express.static(path.join(__dirname, 'public')));
 
 // middlewares
 app.use(express.json());
