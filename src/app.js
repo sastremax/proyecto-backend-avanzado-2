@@ -11,6 +11,7 @@ import initializePassport from './config/passport.config.js';
 import SessionsRouter from './routes/sessions.router.js';
 import BaseRouter from './routes/base.router.js';
 import UsersRouter from './routes/users.router.js';
+import ProductsRouter from './routes/products.router.js';
 
 dotenv.config();
 
@@ -52,6 +53,7 @@ app.use(passport.session())
 
 app.use('/api/users', new UsersRouter().getRouter());
 app.use('/api/sessions', new SessionsRouter().getRouter());
+app.use('/api/products', new ProductsRouter().getRouter());
 app.use('/base', new BaseRouter().getRouter());
 
 // servidor
