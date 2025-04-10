@@ -12,6 +12,7 @@ import SessionsRouter from './routes/sessions.router.js';
 import BaseRouter from './routes/base.router.js';
 import UsersRouter from './routes/users.router.js';
 import ProductsRouter from './routes/products.router.js';
+import CartsRouter from './routes/carts.router.js';
 
 dotenv.config();
 
@@ -54,6 +55,7 @@ app.use(passport.session())
 app.use('/api/users', new UsersRouter().getRouter());
 app.use('/api/sessions', new SessionsRouter().getRouter());
 app.use('/api/products', new ProductsRouter().getRouter());
+app.use('/api/carts', new CartsRouter().getRouter());
 app.use('/base', new BaseRouter().getRouter());
 
 // servidor
