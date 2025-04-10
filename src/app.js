@@ -5,8 +5,8 @@ import cookieParser from 'cookie-parser';
 import { engine } from 'express-handlebars';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import session from 'express-session'; 
-import passport from 'passport';   
+import session from 'express-session';
+import passport from 'passport';
 import initializePassport from './config/passport.config.js';
 import SessionsRouter from './routes/sessions.router.js';
 import BaseRouter from './routes/base.router.js';
@@ -43,7 +43,7 @@ app.use(cookieParser());
 
 // rutas
 app.use(session({
-    secret: process.env.SECRET_KEY, 
+    secret: process.env.SECRET_KEY,
     resave: false,
     saveUninitialized: false,
     cookie: { secure: false }
