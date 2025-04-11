@@ -1,3 +1,5 @@
+// archivo en desuso, porque se cambio la logica
+
 import { UserModel } from '../models/User.model.js';
 import { hashPassword } from '../utils/hash.js';  
 
