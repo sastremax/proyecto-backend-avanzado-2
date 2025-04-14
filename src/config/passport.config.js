@@ -4,6 +4,7 @@ import GitHubStrategy from 'passport-github2';  // importo la estrategia de GitH
 import { Strategy as JwtStrategy, ExtractJwt } from 'passport-jwt';   // importo JWT
 import { UserManager } from '../dao/mongo/UserManager.js';  // importo el modelo de usuario desde dao
 import { hashPassword, isValidPassword } from '../utils/hash.js';
+import Cart from '../models/Cart.model.js';
 
 const userManager = new UserManager();
 
@@ -43,13 +44,17 @@ const initializePassport = () => {
                 if (exists) {
                     return done(null, false, { message: 'User already exists' });
                 }
-                    const hashedPassword = hashPassword(password); // hasheo la contraseña
+                const hashedPassword = hashPassword(password); // hasheo la contraseña
+                
+                const cart = await Cart.create({ products: [] });
+
                 const user = await userManager.createUser({
                     first_name,
                     last_name,
                     email,
                     password: hashedPassword,
                     age,
+                    cart: cart._id,
                     role: email === 'adminCoder@coder.com' ? 'admin' : 'user' // asigno el role según el correo
                 })
                 return done(null, user); // devuelvo el usuario

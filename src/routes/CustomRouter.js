@@ -47,7 +47,7 @@ export default class CustomRouter {
         res.conflict = (error) => {
             res.status(409).json({ status: 'error', error });
         };
-        
+
         res.internalError = (error) => {
             res.status(500).json({ status: 'error', error });
         };
@@ -58,4 +58,13 @@ export default class CustomRouter {
     post(path, ...middlewares) {
         this.router.post(path, (req, res, next) => this.#generateCustomResponses(req, res, next), ...middlewares);
     }
+
+    put(path, ...middlewares) {
+        this.router.put(path, (req, res, next) => this.#generateCustomResponses(req, res, next), ...middlewares);
+    }
+
+    delete(path, ...middlewares) {
+        this.router.delete(path, (req, res, next) => this.#generateCustomResponses(req, res, next), ...middlewares);
+    }
+
 }
