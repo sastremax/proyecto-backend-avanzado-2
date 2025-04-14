@@ -2,7 +2,7 @@ import CustomRouter from './CustomRouter.js';
 import passport from 'passport';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
-import { authorizationRole } from '../middlewares/auth.middleware.js';
+import { handlePolicies } from '../middlewares/handlePolicies.js';
 
 dotenv.config();
 
@@ -13,7 +13,7 @@ export default class SessionsRouter extends CustomRouter {
             passport.authenticate('login', { session: false }, (err, user, info) => {
                 if (err) return next(err);
                 if (!user) return res.unauthorized(info?.message || 'Login failed');
-            
+
                 const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
                 res.cookie('jwtToken', token, { httpOnly: true });
 
@@ -38,8 +38,7 @@ export default class SessionsRouter extends CustomRouter {
 
         // current
         this.get('/current',
-            passport.authenticate('current', { session: false }),
-            authorizationRole(),
+            handlePolicies(['USER', 'ADMIN']),
             (req, res) => {
                 res.success('Current user', req.user);
             }

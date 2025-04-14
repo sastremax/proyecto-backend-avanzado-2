@@ -1,5 +1,5 @@
 import CustomRouter from './CustomRouter.js';
-import { authorizationRole } from '../middlewares/auth.middleware.js';
+import { handlePolicies } from '../middlewares/handlePolicies.js';
 import passport from 'passport';
 import jwt from 'jsonwebtoken';
 
@@ -17,8 +17,7 @@ export default class UsersRouter extends CustomRouter {
 
         // productos solo para admin
         this.get('/products',
-            passport.authenticate('current', { session: false }),
-            authorizationRole('admin'),
+            handlePolicies(['ADMIN']),
             (req, res) => {
                 const user = req.user
                 res.render('products', { user }); // renderizo la vista de produc0tos con los datos del usuario
