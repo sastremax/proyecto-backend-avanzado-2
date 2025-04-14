@@ -15,15 +15,16 @@ export default class SessionsRouter extends CustomRouter {
                 if (err) return next(err);
                 if (!user) return res.unauthorized(info?.message || 'Login failed');
 
-                const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-                res.cookie('jwtToken', token, { httpOnly: true });
-
-                res.success('Login successful', {
+                const token = jwt.sign({
+                    _id: user._id,
                     first_name: user.first_name,
                     last_name: user.last_name,
                     email: user.email,
-                    role: user.role
-                });
+                    role: user.role,
+                    cart: user.cart
+                }, process.env.JWT_SECRET, { expiresIn: '1h' });
+                res.cookie('jwtToken', token, { httpOnly: true });
+                res.redirect('/views/products/view');
             })(req, res, next);
 
         });

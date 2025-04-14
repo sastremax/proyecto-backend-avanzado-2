@@ -25,14 +25,25 @@ export default class ViewsRouter extends CustomRouter {
         // vista de productos
         this.get('/products/view', attachUserFromToken, handlePolicies(['USER', 'ADMIN']), async (req, res) => {
             try {
-                const products = await Product.find();
+                const { page = 1, limit = 5 } = req.query;
+                
+                const result = await Product.paginate({}, { page, limit, lean: true }); 
+                
                 res.render('home', {
-                    products,
+                    products: result.docs,
+                    pagination: {
+                        hasPrevPage: result.hasPrevPage,
+                        hasNextPage: result.hasNextPage,
+                        prevPage: result.prevPage,
+                        nextPage: result.nextPage,
+                        currentPage: result.page
+                    },
                     user: req.user,
+                    cartId: req.user?.cart,
                     layout: "main"
                 });
             } catch (error) {
-                console.error("Error loading products view:", error);
+                console.error("Error loading paginated products:", error);
                 res.status(500).send("Error loading product list");
             }
         });
@@ -125,6 +136,27 @@ export default class ViewsRouter extends CustomRouter {
                 res.status(500).send("Error uploading image.");
             }
         });
+
+        // Vista de productos
+        this.get('/products/details/:id', attachUserFromToken, handlePolicies(['USER', 'ADMIN']), async (req, res) => {
+            try {
+                const product = await Product.findById(req.params.id).lean();
+                if (!product) {
+                    return res.status(404).render("error", { message: "Producto no encontrado" });
+                }
+
+                res.render('productDetails', {
+                    product,
+                    user: req.user,
+                    cartId: req.user?.cart,
+                    layout: "main"
+                });
+            } catch (error) {
+                console.error("Error loading product details:", error);
+                res.status(500).send("Error loading product details");
+            }
+        });
+
     }
 
 }

@@ -20,19 +20,29 @@ dotenv.config();
 const app = express()
 const PORT = process.env.PORT || 8084
 
-// configuro handlebars como motor de plantillas
-app.engine('handlebars', engine({
-    runtimeOptions: {
-        allowProtoPropertiesByDefault: true,
-        allowProtoMethodsByDefault: true
-    }
-}))
 app.set('view engine', 'handlebars')
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
 app.set('views', path.join(__dirname, 'views'))
 app.use(express.static(path.join(__dirname, 'public')));
+
+// configuro handlebars como motor de plantillas
+app.engine('handlebars', engine({
+    defaultLayout: 'main',
+    layoutsDir: path.join(__dirname, 'views', 'layouts'),
+    partialsDir: path.join(__dirname, 'views', 'partials'),
+    helpers: {
+        multiply: (a, b) => a * b,
+        calculateTotal: (products) => {
+            return products.reduce((total, item) => total + (item.product.price * item.quantity), 0);
+        }
+    },
+    runtimeOptions: {
+        allowProtoPropertiesByDefault: true,
+        allowProtoMethodsByDefault: true
+    }
+}))
 
 // middlewares
 app.use(express.json());
