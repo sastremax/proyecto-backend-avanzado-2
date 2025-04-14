@@ -14,6 +14,10 @@
   <p style="color: red;">{{error}}</p>
   {{/if}}
 
+  {{#if success}}
+  <p style="color: green;">{{success}}</p>
+  {{/if}}
+
   <form action="/api/sessions/login" method="POST">
     <label>Email:</label>
     <input type="email" name="email" required />

@@ -10,6 +10,7 @@ export default class SessionsRouter extends CustomRouter {
     init() {
         // login con passport y generación de JWT
         this.post('/login', (req, res, next) => {
+
             passport.authenticate('login', { session: false }, (err, user, info) => {
                 if (err) return next(err);
                 if (!user) return res.unauthorized(info?.message || 'Login failed');
@@ -24,30 +25,42 @@ export default class SessionsRouter extends CustomRouter {
                     role: user.role
                 });
             })(req, res, next);
+
         });
 
         // registro con passport
         this.post('/register', (req, res, next) => {
+            
             passport.authenticate('register', { session: false }, (err, user, info) => {
                 if (err) return next(err);
-                if (!user) return res.badRequest(info?.message);
-
-                res.created('User registered successfully');
+                
+                if (!user) {
+                    const errorMessage = encodeURIComponent(info?.message || 'Registration failed');
+                    const redirectUrl = `/views/register?error=${errorMessage}&first_name=${req.body.first_name}&last_name=${req.body.last_name}&email=${req.body.email}&age=${req.body.age}`;
+                    return res.redirect(redirectUrl);
+                }
+                
+                res.redirect('/views/login?success=User+registered+successfully,+please+log+in');
             })(req, res, next);
+        
         });
 
         // current
         this.get('/current',
             handlePolicies(['USER', 'ADMIN']),
+
             (req, res) => {
                 res.success('Current user', req.user);
             }
+
         );
 
         // logout
         this.get('/logout', (req, res) => {
+
             res.clearCookie('jwtToken');
             res.success('Logout successful');
+
         });
     }
 }

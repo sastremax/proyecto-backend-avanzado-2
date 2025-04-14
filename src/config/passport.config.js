@@ -40,9 +40,13 @@ const initializePassport = () => {
                     return done(null, false, { message: 'Invalid age' });
                 }
                 
+                if (Number.isNaN(age) || age <13) {
+                    return done(null, false, { message: 'minimum age required 13' });
+                }
+
                 const exists = await userManager.getByEmail(email) // busco si el usuario ya estite
                 if (exists) {
-                    return done(null, false, { message: 'User already exists' });
+                    return done(null, false, { message: 'User already exists. Change your email, please' });
                 }
                 const hashedPassword = hashPassword(password); // hasheo la contraseña
                 

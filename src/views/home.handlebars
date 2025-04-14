@@ -1,3 +1,6 @@
+{{#if user}}
+<p><strong>Bienvenido/a {{user.first_name}} {{user.last_name}} ({{user.email}}) - Rol: {{user.role}}</strong></p>
+{{/if}}
 <main class="product-list">
     <h2>Products</h2>
     <ul id="productList">
