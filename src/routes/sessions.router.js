@@ -1,10 +1,8 @@
 import CustomRouter from './CustomRouter.js';
 import passport from 'passport';
 import jwt from 'jsonwebtoken';
-import dotenv from 'dotenv';
+import config from '../config/config.js';
 import { handlePolicies } from '../middlewares/handlePolicies.js';
-
-dotenv.config();
 
 export default class SessionsRouter extends CustomRouter {
     init() {
@@ -22,7 +20,7 @@ export default class SessionsRouter extends CustomRouter {
                     email: user.email,
                     role: user.role,
                     cart: user.cart
-                }, process.env.JWT_SECRET, { expiresIn: '1h' });
+                }, config.jwt_secret, { expiresIn: '1h' });
                 res.cookie('jwtToken', token, { httpOnly: true });
                 res.redirect('/views/products/view');
             })(req, res, next);

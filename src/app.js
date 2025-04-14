@@ -1,6 +1,5 @@
 import express from 'express';
 import { connectToDB } from './config/db.js';
-import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
 import { engine } from 'express-handlebars';
 import path from 'node:path';
@@ -14,11 +13,10 @@ import UsersRouter from './routes/users.router.js';
 import ProductsRouter from './routes/products.router.js';
 import CartsRouter from './routes/carts.router.js';
 import ViewsRouter from './routes/views.router.js';
-
-dotenv.config();
+import config from './config/config.js';
 
 const app = express()
-const PORT = process.env.PORT || 8084
+const PORT = config.port;
 
 app.set('view engine', 'handlebars')
 const __filename = fileURLToPath(import.meta.url)
@@ -53,7 +51,7 @@ app.use(cookieParser());
 
 // rutas
 app.use(session({
-    secret: process.env.SECRET_KEY,
+    secret: config.secret_key,
     resave: false,
     saveUninitialized: false,
     cookie: { secure: false }

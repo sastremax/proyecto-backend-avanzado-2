@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken';
+import config from '../config/config.js';
 
 export function handlePolicies(policies = []) {
     return async (req, res, next) => {
@@ -20,7 +21,7 @@ export function handlePolicies(policies = []) {
             }
             if (!token) return res.unauthorized('Token missing or malformed');
             
-            const decoded = jwt.verify(token, process.env.JWT_SECRET);
+            const decoded = jwt.verify(token, config.jwt_secret);
             req.user = decoded;
 
             // rol del usuario dentro de las politicas

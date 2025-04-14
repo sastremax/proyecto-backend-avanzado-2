@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken';
+import config from '../config/config.js';
 
 export function attachUserFromToken(req, res, next) {
 
@@ -6,7 +7,7 @@ export function attachUserFromToken(req, res, next) {
         const token = req.cookies.jwtToken;
         if (!token) return next();
 
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const decoded = jwt.verify(token, config.jwt_secret);
         req.user = decoded;
         next();
     } catch (error) {

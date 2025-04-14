@@ -2,17 +2,18 @@ import CustomRouter from './CustomRouter.js';
 import { handlePolicies } from '../middlewares/handlePolicies.js';
 import passport from 'passport';
 import jwt from 'jsonwebtoken';
+import config from '../config/config.js';
 
 export default class UsersRouter extends CustomRouter {
     init() {
         // renderizo el formulario de login
         this.get('/login/form', (req, res) => {
-            res.render('login', { title: 'Login' }) // renderizo la vista login.handlebars
+            res.render('login', { title: 'Login' })
         });
 
         // renderizo el formulario de registro
         this.get('/register', (req, res) => {
-            res.render('register', { title: 'Register' }) // renderizo la vista register.handlebars
+            res.render('register', { title: 'Register' })
         });
 
         // productos solo para admin
@@ -20,7 +21,7 @@ export default class UsersRouter extends CustomRouter {
             handlePolicies(['ADMIN']),
             (req, res) => {
                 const user = req.user
-                res.render('products', { user }); // renderizo la vista de produc0tos con los datos del usuario
+                res.render('products', { user });
             }
         );
 
@@ -30,13 +31,13 @@ export default class UsersRouter extends CustomRouter {
         // callback de GitHub luego de autenticar
         this.get('/githubcallback',
             passport.authenticate('github', {
-                failureRedirect: '/api/users/login/form', // si falla vuelve al formulario
+                failureRedirect: '/api/users/login/form', 
                 session: false
             }),
             (req, res) => {
                 const user = req.user;
                 try {
-                    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+                    const token = jwt.sign({ id: user._id }, config.jwt_secret, { expiresIn: '1h' });
                     res.cookie('jwtToken', token, { httpOnly: true });
                     res.redirect('/views/products/view');
                 } catch (error) {

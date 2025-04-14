@@ -1,14 +1,15 @@
-import passport from 'passport'; // importo passport principal
-import local from 'passport-local'; // importo la estrategia local
-import GitHubStrategy from 'passport-github2';  // importo la estrategia de GitHub
-import { Strategy as JwtStrategy, ExtractJwt } from 'passport-jwt';   // importo JWT
-import { UserManager } from '../dao/mongo/UserManager.js';  // importo el modelo de usuario desde dao
+import passport from 'passport';
+import local from 'passport-local';
+import GitHubStrategy from 'passport-github2';
+import { Strategy as JwtStrategy, ExtractJwt } from 'passport-jwt';
+import { UserManager } from '../dao/mongo/UserManager.js';
 import { hashPassword, isValidPassword } from '../utils/hash.js';
 import Cart from '../models/Cart.model.js';
+import config from './config.js';
 
 const userManager = new UserManager();
 
-const LocalStrategy = local.Strategy;  // creo una constante para usar la estrategia local
+const LocalStrategy = local.Strategy;
 
 const cookieExtractor = (req) => {
     return req?.cookies?.jwtToken;
@@ -21,9 +22,8 @@ const initializePassport = () => {
         { passReqToCallback: true, usernameField: 'email' },
         async (req, email, password, done) => {
             try {
-                const { first_name, last_name, age } = req.body // obtengo los datos del body
+                const { first_name, last_name, age } = req.body
                 
-                // validaciones personalizadas
                 if (!first_name || !last_name || !email || !password || !age) {
                     return done(null, false, { message: 'All fields are required' });
                 }
@@ -44,11 +44,11 @@ const initializePassport = () => {
                     return done(null, false, { message: 'minimum age required 13' });
                 }
 
-                const exists = await userManager.getByEmail(email) // busco si el usuario ya estite
+                const exists = await userManager.getByEmail(email)
                 if (exists) {
                     return done(null, false, { message: 'User already exists. Change your email, please' });
                 }
-                const hashedPassword = hashPassword(password); // hasheo la contraseña
+                const hashedPassword = hashPassword(password);
                 
                 const cart = await Cart.create({ products: [] });
 
@@ -59,9 +59,9 @@ const initializePassport = () => {
                     password: hashedPassword,
                     age,
                     cart: cart._id,
-                    role: email === 'adminCoder@coder.com' ? 'admin' : 'user' // asigno el role según el correo
+                    role: email === 'adminCoder@coder.com' ? 'admin' : 'user'
                 })
-                return done(null, user); // devuelvo el usuario
+                return done(null, user);
             } catch (error) {
                 return done(error)
             }
@@ -81,7 +81,7 @@ const initializePassport = () => {
                 if (!valid) {
                     return done(null, false, { message: 'Incorrect password' });
                 }
-                    return done(null, user) // si está bien, devuelvo el usuario
+                    return done(null, user)
             } catch (error) {
                 return done(error)
             }
@@ -90,19 +90,19 @@ const initializePassport = () => {
 
     // estrategia GitHub
     passport.use('github', new GitHubStrategy({
-        clientID: process.env.GITHUB_CLIENT_ID, // lo toma del .env
-        clientSecret: process.env.GITHUB_CLIENT_SECRET,
+        clientID: config.github_client_id,
+        clientSecret: config.github_client_secret,
         callbackURL: 'http://localhost:8084/api/users/githubcallback'
     }, async (accessToken, refreshToken, profile, done) => {
         try {
-            const email = profile._json.email || `${profile.username}@github.com` // fallback por si no tiene email público
+            const email = profile._json.email || `${profile.username}@github.com`
             let user = await userManager.getByEmail(email);
             if (!user) {
                 user = await userManager.createUser({
                     first_name: profile.username,
                     last_name: 'GitHubUser',
                     email,
-                    password: '', // sin password porque se loguea por GitHub
+                    password: '',
                     role: profile.username === 'sastremax' ? 'admin' : 'user'
                 });
             }
@@ -116,7 +116,7 @@ const initializePassport = () => {
     passport.use('current', new JwtStrategy(
         {
             jwtFromRequest: ExtractJwt.fromExtractors([cookieExtractor]),
-            secretOrKey: process.env.JWT_SECRET
+            secretOrKey: config.jwt_secret
         },
         async (jwtPayload, done) => {
             try {
