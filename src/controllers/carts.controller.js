@@ -44,7 +44,7 @@ export async function getCartById(req, res) {
         });
 
         if (!cart) return res.badRequest('Cart not found');
-        res.success('Cart encontrado', cart);
+        res.success('Cart founded', cart);
     } catch (error) {
         console.log('Error getting cart by id:', error);
         res.internalError('Error getting cart by id');

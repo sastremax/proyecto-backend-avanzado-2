@@ -1,3 +1,4 @@
+import { handlePolicies } from '../middlewares/handlePolicies.js';
 import CustomRouter from './CustomRouter.js';
 import Cart from '../models/Cart.model.js';
 import Product from '../models/Product.model.js';
@@ -7,6 +8,30 @@ import mongoose from 'mongoose';
 export default class ViewsRouter extends CustomRouter {
 
     init() {
+
+        // vista de registro
+        this.get('/register', (req, res) => {
+            const { error } = req.query;
+            res.render('register', { error });
+        });
+
+        // vista de logueo
+        this.get('/login', (req, res) => {
+            const { error } = req.query;
+            res.render('login', { error });
+        });
+
+        // vista de productos
+        this.get('/products/view', handlePolicies(['USER', 'ADMIN']), async (req, res) => {
+            try {
+                const products = await Product.find();
+                res.render('home', { products });
+            } catch (error) {
+                console.error("Error loading products view:", error);
+                res.status(500).send("Error loading product list");
+            }
+        });
+
         // vista de un carrito
         this.get('/cart/:id', async (req, res) => {
             try {
