@@ -105,26 +105,6 @@ ul#productList li button:hover {
   margin: 0 auto;
 }
 
-.realTimeProductContainer {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-around;
-  gap: 20px;
-  margin-top: 20px;
-}
-
-.realTimeProductContainer div {
-  width: 250px;
-  height: auto;
-  padding: 20px;
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
-
 form {
   display: flex;
   flex-direction: column;
