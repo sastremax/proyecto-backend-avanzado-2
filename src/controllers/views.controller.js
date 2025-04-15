@@ -119,24 +119,23 @@ export const uploadProductImage = async (req, res) => {
         console.error("Error uploading product image:", error);
         res.status(500).send("Error uploading image.");
     }
+};
 
-    export const renderProductDetails = async (req, res) => {
-        try {
-            const product = await Product.findById(req.params.id).lean();
-            if (!product) {
-                return res.status(404).render("error", { message: "Product not founded" });
-            }
-
-            res.render('productDetails', {
-                product,
-                user: req.user,
-                cartId: req.user?.cart,
-                layout: "main"
-            });
-        } catch (error) {
-            console.error("Error loading product details:", error);
-            res.status(500).send("Error loading product details");
+export const renderProductDetails = async (req, res) => {
+    try {
+        const product = await Product.findById(req.params.id).lean();
+        if (!product) {
+            return res.status(404).render("error", { message: "Product not founded" });
         }
-    };
 
+        res.render('productDetails', {
+            product,
+            user: req.user,
+            cartId: req.user?.cart,
+            layout: "main"
+        });
+    } catch (error) {
+        console.error("Error loading product details:", error);
+        res.status(500).send("Error loading product details");
+    }
 };

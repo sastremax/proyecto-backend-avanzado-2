@@ -29,10 +29,10 @@ export async function seedCarts(req, res) {
         ];
 
         await Cart.insertMany(carts);
-        res.created('Carritos agregados con éxito');
+        res.created('Sample carts added successfully');
     } catch (error) {
-        console.error('Error al insertar carritos:', error);
-        res.internalError('Error al insertar carritos');
+        console.error('Error inserting sample carts:', error);
+        res.internalError('Error inserting sample carts');
     }
 }
 
@@ -54,7 +54,7 @@ export async function getCartById(req, res) {
 export async function createCart(req, res) {
     try {
         const newCart = await Cart.create({ products: [] });
-        res.created('Carrito creado correctamente', newCart);
+        res.created('Cart created successfully', newCart);
     } catch (error) {
         console.log('Error creating cart:', error);
         res.internalError('Error creating cart');
