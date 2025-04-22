@@ -17,6 +17,7 @@ export const loginSession = (req, res, next) => {
         res.cookie('jwtToken', token, { httpOnly: true });
         res.redirect('/views/products/view');
     } catch (error) {
+        console.error('Error during login session:', error);
         next(error);
     }
 };

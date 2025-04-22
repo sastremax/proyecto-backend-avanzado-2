@@ -8,7 +8,8 @@ const config = {
     jwt_secret: process.env.JWT_SECRET,
     github_client_id: process.env.GITHUB_CLIENT_ID,
     github_client_secret: process.env.GITHUB_CLIENT_SECRET,
-    mongo_uri: process.env.MONGO_URI
+    mongo_uri: process.env.MONGO_URI,
+    persistence: process.env.PERSISTENCE
 };
 
 export default config;
