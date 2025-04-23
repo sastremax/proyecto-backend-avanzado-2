@@ -13,6 +13,7 @@ import UsersRouter from './routes/users.router.js';
 import ProductsRouter from './routes/products.router.js';
 import CartsRouter from './routes/carts.router.js';
 import ViewsRouter from './routes/views.router.js';
+import errorHandler from './middlewares/errorHandler.middleware.js';
 import config from './config/config.js';
 
 const app = express()
@@ -43,6 +44,7 @@ app.engine('handlebars', engine({
 }))
 
 // middlewares
+app.use(errorHandler);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 

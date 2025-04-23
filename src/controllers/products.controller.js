@@ -1,48 +1,53 @@
 import ProductModel from '../models/Product.model.js';
+import CustomError from '../utils/customError.js';
 
 // GET /api/products
-export async function getProducts(req, res) {
+export async function getProducts(req, res, next) {
     try {
         const products = await ProductModel.find();
         res.success('Products retrieved', products);
     } catch (error) {
         console.error('Error getting products:', error);
-        res.internalError('Error getting products');
+        next(new CustomError('Error getting products', 500));
     }
 }
 
 // GET /api/products/:id
-export async function getProductById(req, res) {
+export async function getProductById(req, res, next) {
     try {
         const product = await ProductModel.findById(req.params.id);
-        if (!product) return res.badRequest('Product not found');
+        if (!product) {
+            return next(new CustomError('Product not found', 400));
+        }
         res.success('Product retrieved', product);
     } catch (error) {
         console.error('Error getting product by ID:', error);
-        res.internalError('Error getting product');
+        next(new CustomError('Error getting product', 500));
     }
 }
 
 // POST /api/products
-export async function addProduct(req, res) {
+export async function addProduct(req, res, next) {
     try {
         const newProduct = await ProductModel.create(req.body);
         res.created('Product created successfully', newProduct);
     } catch (error) {
         console.error('Error creating product:', error);
-        res.internalError('Error creating product');
+        next(new CustomError('Error creating product', 500));
     }
 }
 
 // PUT /api/products/:id
-export async function updateProduct(req, res) {
+export async function updateProduct(req, res, next) {
     try {
         const updated = await ProductModel.findByIdAndUpdate(req.params.id, req.body, { new: true });
-        if (!updated) return res.badRequest('Product not found');
+        if (!updated) {
+            return next(new CustomError('Product not found', 400));
+        }
         res.success('Product updated', updated);
     } catch (error) {
         console.error('Error updating product:', error);
-        res.internalError('Error updating product');
+        next(new CustomError('Error updating product', 500));
     }
 }
 
@@ -50,10 +55,13 @@ export async function updateProduct(req, res) {
 export async function deleteProduct(req, res) {
     try {
         const deleted = await ProductModel.findByIdAndDelete(req.params.id);
-        if (!deleted) return res.badRequest('Product not found');
+        if (!deleted) {
+            return next(new CustomError('Product not found', 400)); // Usamos CustomError si el producto no se encuentra
+        }
+
         res.success('Product deleted', deleted);
     } catch (error) {
         console.error('Error deleting product:', error);
-        res.internalError('Error deleting product');
+        next(new CustomError('Error deleting product', 500));
     }
 }
