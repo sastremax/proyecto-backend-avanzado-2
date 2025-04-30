@@ -52,7 +52,7 @@ Ejecutar el Servidor
 
 npm run dev
 
-Esto inicia el servidor en: http://localhost:8084
+Esto inicia el servidor en: http://localhost:8080
 
 Funcionalidades Principales
 
