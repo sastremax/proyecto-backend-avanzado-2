@@ -2,19 +2,16 @@ import jwt from 'jsonwebtoken';
 import config from '../config/config.js';
 import CartModel from '../models/Cart.model.js';
 import UserModel from '../models/User.model.js';
+import { UsersDTO } from '../dto/UsersDTO.js';
+import { UserService } from '../services/UserService.js';
+
+const userService = new UserService();
 
 export const loginSession = (req, res, next) => {
     try {
-        const user = req.user;
+        const dtoUser = userService.formatUser(req.user);
 
-        const token = jwt.sign({
-            _id: user._id,
-            first_name: user.first_name,
-            last_name: user.last_name,
-            email: user.email,
-            role: user.role,
-            cart: user.cart
-        }, config.jwt_secret, { expiresIn: '1h' });
+        const token = jwt.sign(dtoUser, config.jwt_secret, { expiresIn: '1h' });
 
         res.cookie('jwtToken', token, { httpOnly: true });
         res.redirect('/views/products/view');
@@ -25,7 +22,7 @@ export const loginSession = (req, res, next) => {
 };
 
 export const registerSession = async (req, res, next) => {
-    
+
     try {
         const user = req.user;
 
@@ -50,7 +47,8 @@ export const registerSession = async (req, res, next) => {
 };
 
 export const currentSession = (req, res) => {
-    res.success('Current user', req.user);
+    const dtoUser = new UsersDTO(req.user);
+    res.success('Current user', dtoUser);
 };
 
 export const logoutSession = (req, res) => {
