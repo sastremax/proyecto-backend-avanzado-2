@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
 import config from '../config/config.js';
+import { UsersDTO } from '../dto/UsersDTO.js';
 
 export const renderLoginForm = (req, res) => {
     res.render('login', { title: 'Login' });
@@ -21,7 +22,7 @@ export const githubCallback = (req, res) => {
         res.cookie('jwtToken', token, { httpOnly: true });
         res.redirect('/views/products/view');
     } catch (error) {
-        res.internalError('GitHub login error:', error);
+        res.status(500).json({ error: 'GitHub login error', details: error });
     }
 };
 
@@ -31,3 +32,12 @@ export const debugSession = (req, res) => {
         user: req.user
     });
 };
+
+export class UsersController {
+    async getUserByEmail(req, res) {
+        const { email } = req.params;
+        const user = await UserManager.getByEmail(email);
+        const userDTO = new UsersDTO(user);
+        res.json(userDTO);
+    }
+}

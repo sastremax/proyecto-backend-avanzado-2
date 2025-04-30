@@ -8,10 +8,11 @@ switch (config.persistence) {
         userManager = new MemoryUserManager();
         break;
     case 'MONGO':
-    default: 
-        const { UserManager } = await import('./mongo/UserManager.js');
+    default:
+        
+    
         userManager = new UserManager();
-        break;        
+        break;
 }
 
 export { userManager };

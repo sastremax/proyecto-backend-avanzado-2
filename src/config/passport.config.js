@@ -23,7 +23,7 @@ const initializePassport = () => {
         async (req, email, password, done) => {
             try {
                 const { first_name, last_name, age } = req.body
-                
+
                 if (!first_name || !last_name || !email || !password || !age) {
                     return done(null, false, { message: 'All fields are required' });
                 }
@@ -39,8 +39,8 @@ const initializePassport = () => {
                 if (Number.isNaN(age) || age <= 0) {
                     return done(null, false, { message: 'Invalid age' });
                 }
-                
-                if (Number.isNaN(age) || age <13) {
+
+                if (Number.isNaN(age) || age < 13) {
                     return done(null, false, { message: 'minimum age required 13' });
                 }
 
@@ -49,7 +49,7 @@ const initializePassport = () => {
                     return done(null, false, { message: 'User already exists. Change your email, please' });
                 }
                 const hashedPassword = hashPassword(password);
-                
+
                 const cart = await Cart.create({ products: [] });
 
                 const user = await userManager.createUser({
@@ -77,11 +77,11 @@ const initializePassport = () => {
                 if (!user) {
                     return done(null, false, { message: 'User not found' });
                 }
-                    const valid = isValidPassword(password, user.password);
+                const valid = isValidPassword(password, user.password);
                 if (!valid) {
                     return done(null, false, { message: 'Incorrect password' });
                 }
-                    return done(null, user)
+                return done(null, user)
             } catch (error) {
                 return done(error)
             }
@@ -92,7 +92,7 @@ const initializePassport = () => {
     passport.use('github', new GitHubStrategy({
         clientID: config.github_client_id,
         clientSecret: config.github_client_secret,
-        callbackURL: 'http://localhost:8084/api/users/githubcallback'
+        callbackURL: 'http://localhost:8080/api/users/githubcallback'
     }, async (accessToken, refreshToken, profile, done) => {
         try {
             const email = profile._json.email || `${profile.username}@github.com`
