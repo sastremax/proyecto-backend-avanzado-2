@@ -232,6 +232,13 @@ export async function purchaseCart(req, res) {
             purchaser: req.user.email
         });
 
+        cart.products = cart.products.filter(item => {
+            const id = item.product?._id?.toString();
+            return !productsPurchased.includes(id);
+        });
+
+        await cart.save();
+        
         res.success('Purchase completed', {
             ticket,
             productsNotPurchased

@@ -14,6 +14,8 @@ import {
 import { addTimestamp } from '../middlewares/logger.middleware.js';
 import { validateProduct } from '../middlewares/error.middleware.js';
 import multerUpload from '../middlewares/multer.middleware.js';
+import passportCall from '../middlewares/passportCall.middleware.js';
+import { authorizationRole } from '../middlewares/auth.middleware.js';
 
 export default class ProductsRouter extends CustomRouter {
 
@@ -22,9 +24,9 @@ export default class ProductsRouter extends CustomRouter {
         // API REST
         this.get('/', addTimestamp, getProducts);
         this.get('/:id', addTimestamp, getProductById);
-        this.post('/', addTimestamp, validateProduct, addProduct);
-        this.put('/:id', addTimestamp, updateProduct);
-        this.delete('/:id', addTimestamp, deleteProduct);
+        this.post('/', passportCall('current'), authorizationRole('admin'), validateProduct, addProduct);
+        this.put('/:id', passportCall('current'), authorizationRole('admin'), updateProduct);
+        this.delete('/:id', passportCall('current'), authorizationRole('admin'), deleteProduct);
 
         // vistas
         this.get('/view/home', getHomeView);
