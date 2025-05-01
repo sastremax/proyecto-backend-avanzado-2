@@ -1,5 +1,6 @@
 import Cart from '../models/Cart.model.js';
 import Product from '../models/Product.model.js';
+import TicketModel from '../models/Ticket.model.js';
 
 export async function seedCarts(req, res) {
     try {
@@ -209,6 +210,7 @@ export async function purchaseCart(req, res) {
 
         let totalAmount = 0;
         const productsNotPurchased = [];
+        const productsPurchased = [];
 
         for (const item of cart.products) {
             const { product, quantity }  = item;
@@ -221,10 +223,17 @@ export async function purchaseCart(req, res) {
             totalAmount += product.price * quantity;
             product.stock -= quantity;
             await product.save();
+            productsPurchased.push(product._id.toString());
         }
 
-        res.success('Cart validated, total calculated', {
-            totalAmount,
+        const ticket = await TicketModel.create({
+            code: Date.now().toString(),
+            amount: totalAmount,
+            purchaser: req.user.email
+        });
+
+        res.success('Purchase completed', {
+            ticket,
             productsNotPurchased
         });
 
