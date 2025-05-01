@@ -207,7 +207,27 @@ export async function purchaseCart(req, res) {
             return res.badRequest('Cart not found');
         }
 
-        res.success('Cart found and populated', cart);
+        let totalAmount = 0;
+        const productsNotPurchased = [];
+
+        for (const item of cart.products) {
+            const { product, quantity }  = item;
+
+            if (!product?._id || product.stock < quantity) {
+                productsNotPurchased.push(item);
+                continue;
+            }
+
+            totalAmount += product.price * quantity;
+            product.stock -= quantity;
+            await product.save();
+        }
+
+        res.success('Cart validated, total calculated', {
+            totalAmount,
+            productsNotPurchased
+        });
+
     } catch (error) {
         console.error('Error in purchaseCart:', error);
         res.internalError('Error processing cart purchase');
