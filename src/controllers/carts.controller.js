@@ -198,7 +198,16 @@ export async function purchaseCart(req, res) {
     try {
         const cartId = req.params.id;
 
-        res.success('Purchase endpoint working');
+        const cart = await Cart.findById(cartId).populate({
+            path: 'products.product',
+            select: 'title price stock'
+        });
+
+        if (!cart) {
+            return res.badRequest('Cart not found');
+        }
+
+        res.success('Cart found and populated', cart);
     } catch (error) {
         console.error('Error in purchaseCart:', error);
         res.internalError('Error processing cart purchase');
