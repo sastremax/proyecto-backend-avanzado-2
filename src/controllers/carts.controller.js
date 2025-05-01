@@ -192,3 +192,16 @@ export async function updateProductQuantity(req, res) {
         res.internalError('Error updating product quantity');
     }
 }
+
+export async function purchaseCart(req, res) {
+    
+    try {
+        const cartId = req.params.id;
+
+        res.success('Purchase endpoint working');
+    } catch (error) {
+        console.error('Error in purchaseCart:', error);
+        res.internalError('Error processing cart purchase');
+    }
+
+}

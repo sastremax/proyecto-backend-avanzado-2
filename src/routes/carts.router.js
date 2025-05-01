@@ -8,7 +8,8 @@ import {
     updateCart,
     updateProductQuantity,
     removeProductFromCart,
-    deleteCart
+    deleteCart,
+    purchaseCart
 } from '../controllers/carts.controller.js';
 
 import { addTimestamp } from '../middlewares/logger.middleware.js';
@@ -23,6 +24,7 @@ export default class CartsRouter extends CustomRouter {
         this.post('/seed', seedCarts);
         this.post('/', createCart);
         this.post('/:id/products/:productId', addProductToCart);
+        this.post('/:id/purchase', purchaseCart);
         this.put('/:id', clearCart);
         this.put('/:id/products', updateCart);
         this.put('/:id/products/:productId', updateProductQuantity);
