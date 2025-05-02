@@ -11,7 +11,8 @@ import {
     deleteCart,
     purchaseCart
 } from '../controllers/carts.controller.js';
-
+import passportCall from '../middlewares/passportCall.middleware.js';
+import { authorizationRole } from '../middlewares/auth.middleware.js';
 import { addTimestamp } from '../middlewares/logger.middleware.js';
 
 export default class CartsRouter extends CustomRouter {
@@ -23,12 +24,42 @@ export default class CartsRouter extends CustomRouter {
         this.get('/:id', getCartById);
         this.post('/seed', seedCarts);
         this.post('/', createCart);
-        this.post('/:id/products/:productId', addProductToCart);
-        this.post('/:id/purchase', purchaseCart);
-        this.put('/:id', clearCart);
-        this.put('/:id/products', updateCart);
-        this.put('/:id/products/:productId', updateProductQuantity);
-        this.delete('/:id/products/:productId', removeProductFromCart);
+        this.post(
+            '/:id/products/:productId',
+            passportCall('current'),
+            authorizationRole('user'),
+            addProductToCart
+        );
+        this.post(
+            '/:id/purchase',
+            passportCall('current'),
+            authorizationRole('user'),
+            purchaseCart
+        );
+        this.put(
+            '/:id',
+            passportCall('current'),
+            authorizationRole('user'),
+            clearCart
+        );
+        this.put(
+            '/:id/products',
+            passportCall('current'),
+            authorizationRole('user'),
+            updateCart
+        );
+        this.put(
+            '/:id/products/:productId',
+            passportCall('current'),
+            authorizationRole('user'),
+            updateProductQuantity
+        );
+        this.delete(
+            '/:id/products/:productId',
+            passportCall('current'),
+            authorizationRole('user'),
+            removeProductFromCart
+        );
         this.delete('/:id', deleteCart);
     }
 }

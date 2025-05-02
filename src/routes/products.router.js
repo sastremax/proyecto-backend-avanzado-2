@@ -4,13 +4,15 @@ import {
     getProductById,
     addProduct,
     updateProduct,
-    deleteProduct,
-    getHomeView,
-    getProductDetailsView,
+    deleteProduct
+} from '../controllers/products.controller.js';
+import {
+    renderProducts,
+    renderProductDetails,
     updateProductView,
     deleteProductView,
-    seedProducts
-} from '../controllers/products.controller.js';
+    uploadProductImage
+} from '../controllers/views.controller.js';
 import { addTimestamp } from '../middlewares/logger.middleware.js';
 import { validateProduct } from '../middlewares/error.middleware.js';
 import multerUpload from '../middlewares/multer.middleware.js';
@@ -29,17 +31,14 @@ export default class ProductsRouter extends CustomRouter {
         this.delete('/:id', passportCall('current'), authorizationRole('admin'), deleteProduct);
 
         // vistas
-        this.get('/view/home', getHomeView);
-        this.get('/view/:id', getProductDetailsView);
+        this.get('/view/home', renderProducts);
+        this.get('/view/:id', renderProductDetails);
         this.put('/view/:id', updateProductView);
         this.delete('/view/:id', deleteProductView);
 
         // carga de archivos
-        this.post('/api/seed', seedProducts);
-        this.post('/api/products/:id/upload', multerUpload.single('image'), (req, res) => {
-            res.success('Imagen subida correctamente', { filename: req.file.filename });
-
-        });
+        this.post('/api/products/:id/upload', multerUpload.single('image'), uploadProductImage
+        );
 
     }
 
