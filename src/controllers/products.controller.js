@@ -26,6 +26,7 @@ export async function getProductById(req, res, next) {
         if (!product) {
             return next(new CustomError('Product not found', 404));
         }
+        
         res.success('Product retrieved', product);
 
     } catch (error) {
@@ -48,11 +49,18 @@ export async function addProduct(req, res, next) {
 // PUT /api/products/:id
 export async function updateProduct(req, res, next) {
     try {
-        const updated = await ProductModel.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        const id = req.params.id;
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return next(new CustomError('Invalid product ID format', 400));
+        }
+        
+        const updated = await ProductModel.findByIdAndUpdate(id, req.body, { new: true });
         if (!updated) {
             return next(new CustomError('Product not found', 400));
         }
+
         res.success('Product updated', updated);
+
     } catch (error) {
         console.error('Error updating product:', error);
         next(new CustomError('Error updating product', 500));
@@ -62,12 +70,18 @@ export async function updateProduct(req, res, next) {
 // DELETE /api/products/:id
 export async function deleteProduct(req, res, next) {
     try {
-        const deleted = await ProductModel.findByIdAndDelete(req.params.id);
+        const id = req.params.id;
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return next(new CustomError('Invalid product ID format', 400));
+        }
+
+        const deleted = await ProductModel.findByIdAndDelete(id);
         if (!deleted) {
-            return next(new CustomError('Product not found', 400)); // Usamos CustomError si el producto no se encuentra
+            return next(new CustomError('Product not found', 400));
         }
 
         res.success('Product deleted', deleted);
+
     } catch (error) {
         console.error('Error deleting product:', error);
         next(new CustomError('Error deleting product', 500));
