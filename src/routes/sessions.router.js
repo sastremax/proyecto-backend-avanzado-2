@@ -41,6 +41,7 @@ export default class SessionsRouter extends CustomRouter {
 
         // current
         this.get('/current',
+            passport.authenticate('current', { session: false }),
             handlePolicies(['USER', 'ADMIN']),
             currentSession
         );

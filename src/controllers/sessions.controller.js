@@ -10,8 +10,14 @@ const userService = new UserService();
 export const loginSession = (req, res, next) => {
     try {
         const dtoUser = userService.formatUser(req.user);
-
-        const token = jwt.sign(dtoUser, config.jwt_secret, { expiresIn: '1h' });
+        const payload = {
+            id: req.user.id,
+            first_name: req.user.first_name,
+            last_name: req.user.last_name,
+            email: dtoUser.email,
+            role: dtoUser.role
+        };
+        const token = jwt.sign(payload, config.jwt_secret, { expiresIn: '1h' });
 
         res.cookie('jwtToken', token, { httpOnly: true });
         res.success('Login successful', { token, user: dtoUser });
@@ -43,6 +49,7 @@ export const registerSession = async (req, res, next) => {
 };
 
 export const currentSession = (req, res) => {
+    console.log('[DEBUG] req.user recibido en /current:', req.user);
     const dtoUser = new UsersDTO(req.user);
     res.success('Current user', dtoUser);
 };

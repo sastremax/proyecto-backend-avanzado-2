@@ -69,6 +69,6 @@ export default class CustomRouter {
         };
 
         next();
-    }    
+    }
 
 }
