@@ -22,7 +22,6 @@ export default class CartsRouter extends CustomRouter {
 
         // rutas de carrito
         this.get('/:id', getCartById);
-        this.post('/seed', seedCarts);
         this.post('/', createCart);
         this.post(
             '/:id/products/:productId',

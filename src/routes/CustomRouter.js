@@ -7,12 +7,28 @@ export default class CustomRouter {
         this.init();
     }
 
+    getRouter() {
+        return this.router;
+    }
+
     get(path, ...middlewares) {
         this.router.get(path, (req, res, next) => this.#generateCustomResponses(req, res, next), ...middlewares);
     }
 
-    getRouter() {
-        return this.router;
+    post(path, ...middlewares) {
+        this.router.post(path, (req, res, next) => this.#generateCustomResponses(req, res, next), ...middlewares);
+    }
+
+    put(path, ...middlewares) {
+        this.router.put(path, (req, res, next) => this.#generateCustomResponses(req, res, next), ...middlewares);
+    }
+
+    delete(path, ...middlewares) {
+        this.router.delete(path, (req, res, next) => this.#generateCustomResponses(req, res, next), ...middlewares);
+    }
+
+    patch(path, ...middlewares) {
+        this.router.patch(path, (req, res, next) => this.#generateCustomResponses(req, res, next), ...middlewares);
     }
 
     init() {
@@ -53,18 +69,6 @@ export default class CustomRouter {
         };
 
         next();
-    }
-
-    post(path, ...middlewares) {
-        this.router.post(path, (req, res, next) => this.#generateCustomResponses(req, res, next), ...middlewares);
-    }
-
-    put(path, ...middlewares) {
-        this.router.put(path, (req, res, next) => this.#generateCustomResponses(req, res, next), ...middlewares);
-    }
-
-    delete(path, ...middlewares) {
-        this.router.delete(path, (req, res, next) => this.#generateCustomResponses(req, res, next), ...middlewares);
-    }
+    }    
 
 }

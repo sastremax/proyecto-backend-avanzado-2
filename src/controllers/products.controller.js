@@ -52,7 +52,7 @@ export async function updateProduct(req, res, next) {
 }
 
 // DELETE /api/products/:id
-export async function deleteProduct(req, res) {
+export async function deleteProduct(req, res, next) {
     try {
         const deleted = await ProductModel.findByIdAndDelete(req.params.id);
         if (!deleted) {

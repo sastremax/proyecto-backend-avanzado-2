@@ -4,7 +4,7 @@ export default class BaseRouter extends CustomRouter {
 
     init() {
         this.get('/ping', (req, res) => {
-            res.success('Pong! Server is alive');
+            res.success('Ping successful', { message: 'Pong! Server is alive' });
         });
     }
 

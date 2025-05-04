@@ -30,6 +30,7 @@ export default class SessionsRouter extends CustomRouter {
 
                 passport.authenticate('register', { session: false }, (err, user, info) => {
                     if (err) return next(err);
+                    if (!user) return res.unauthorized(info?.message || 'Registration failed');
                     req.user = user;
                     req.authInfo = info;
                     next();

@@ -14,7 +14,7 @@ export const loginSession = (req, res, next) => {
         const token = jwt.sign(dtoUser, config.jwt_secret, { expiresIn: '1h' });
 
         res.cookie('jwtToken', token, { httpOnly: true });
-        res.redirect('/views/products/view');
+        res.success('Login successful', { token, user: dtoUser });
     } catch (error) {
         console.error('Error during login session:', error);
         next(error);
@@ -27,17 +27,13 @@ export const registerSession = async (req, res, next) => {
         const user = req.user;
 
         if (!user) {
-            const info = req.authInfo || {};
-            const errorMessage = encodeURIComponent(info.message || 'Registration failed');
-            const redirectUrl = `/views/register?error=${errorMessage}&first_name=${req.body.first_name}&last_name=${req.body.last_name}&email=${req.body.email}&age=${req.body.age}`;
-            return res.redirect(redirectUrl);
+            return res.badRequest('User registration failed');
         }
 
         const newCart = await CartModel.create({ products: [] });
-
         await UserModel.findByIdAndUpdate(user._id, { cart: newCart._id });
 
-        res.redirect('/views/login?success=User+registered+successfully,+please+log+in');
+        res.created('User registered successfully');
 
     } catch (error) {
         console.error('Error during registration session:', error);
