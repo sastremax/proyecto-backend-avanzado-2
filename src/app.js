@@ -9,14 +9,13 @@ import BaseRouter from './routes/base.router.js';
 import UsersRouter from './routes/users.router.js';
 import ProductsRouter from './routes/products.router.js';
 import CartsRouter from './routes/carts.router.js';
-// import errorHandler from './middlewares/errorHandler.middleware.js';
+import errorHandler from './middlewares/errorHandler.middleware.js';
 import config from './config/config.js';
 
 const app = express()
 const PORT = config.port;
 
 // middlewares
-// app.use(errorHandler);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -41,6 +40,7 @@ app.use('/api/products', new ProductsRouter().getRouter());
 app.use('/api/carts', new CartsRouter().getRouter());
 app.use('/base', new BaseRouter().getRouter());
 
+app.use(errorHandler);
 // servidor
 const startServer = async () => {
     await connectToDB()

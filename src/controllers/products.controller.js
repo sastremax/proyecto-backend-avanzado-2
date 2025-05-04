@@ -1,5 +1,6 @@
 import ProductModel from '../models/Product.model.js';
 import CustomError from '../utils/customError.js';
+import mongoose from 'mongoose';
 
 // GET /api/products
 export async function getProducts(req, res, next) {
@@ -15,11 +16,18 @@ export async function getProducts(req, res, next) {
 // GET /api/products/:id
 export async function getProductById(req, res, next) {
     try {
-        const product = await ProductModel.findById(req.params.id);
+        const id = req.params.id;
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return next(new CustomError('Invalid product ID format', 400));
+        }
+
+        const product = await ProductModel.findById(id);
+
         if (!product) {
-            return next(new CustomError('Product not found', 400));
+            return next(new CustomError('Product not found', 404));
         }
         res.success('Product retrieved', product);
+
     } catch (error) {
         console.error('Error getting product by ID:', error);
         next(new CustomError('Error getting product', 500));
