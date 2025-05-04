@@ -24,6 +24,7 @@ const initializePassport = () => {
             try {
                 const { first_name, last_name, age } = req.body
 
+                const numericAge = Number(age);
                 if (!first_name || !last_name || !email || !password || !age) {
                     return done(null, false, { message: 'All fields are required' });
                 }
@@ -32,15 +33,15 @@ const initializePassport = () => {
                     return done(null, false, { message: 'Invalid email format' });
                 }
 
-                if (password.length < 6) {
-                    return done(null, false, { message: 'Password must be at least 6 characters' });
+                if (password.length < 8) {
+                    return done(null, false, { message: 'Password must be at least 8 characters' });
                 }
 
-                if (Number.isNaN(age) || age <= 0) {
+                if (isNaN(numericAge) || numericAge <= 0) {
                     return done(null, false, { message: 'Invalid age' });
                 }
 
-                if (Number.isNaN(age) || age < 13) {
+                if (numericAge < 13) {
                     return done(null, false, { message: 'minimum age required 13' });
                 }
 
