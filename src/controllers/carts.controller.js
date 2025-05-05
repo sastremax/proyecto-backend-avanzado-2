@@ -110,6 +110,10 @@ export async function removeProductFromCart(req, res) {
     try {
         const { id, productId } = req.params;
 
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.badRequest('Invalid cart ID format');
+        }
+        
         const cart = await Cart.findById(id);
         if (!cart) return res.notFound('Cart not found');
 
@@ -130,6 +134,11 @@ export async function removeProductFromCart(req, res) {
 
 export async function clearCart(req, res) {
     try {
+
+        if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+            return res.badRequest('Invalid cart ID format');
+        }
+
         const cart = await Cart.findById(req.params.id);
         if (!cart) return res.notFound('Cart not found');
 
