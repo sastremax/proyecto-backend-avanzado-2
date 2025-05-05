@@ -11,12 +11,14 @@ import ProductsRouter from './routes/products.router.js';
 import CartsRouter from './routes/carts.router.js';
 import errorHandler from './middlewares/errorHandler.middleware.js';
 import config from './config/config.js';
+import customResponses from './middlewares/customResponses.middleware.js';
 
 const app = express()
 const PORT = config.port;
 
 // middlewares
 app.use(express.json());
+app.use(customResponses);
 app.use(express.urlencoded({ extended: true }));
 
 // lectura de cookies

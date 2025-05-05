@@ -66,7 +66,11 @@ export async function createCart(req, res) {
 export async function addProductToCart(req, res) {
     try {
         const { cid, pid } = req.params;
-        const quantity = Number.parseInt(req.body.quantity) > 0 ? Number.parseInt(req.body.quantity) : 1;
+        const quantity = Number(req.body.quantity);
+
+        if (!Number.isInteger(quantity) || quantity <= 0) {
+            return res.badRequest('Quantity must be a positive integer');
+        }
 
         if (!mongoose.Types.ObjectId.isValid(cid)) {
             return res.badRequest('Invalid cart ID format');
@@ -81,6 +85,10 @@ export async function addProductToCart(req, res) {
 
         const productExists = await Product.findById(pid);
         if (!productExists) return res.notFound('Product not found');
+
+        if (quantity > productExists.stock) {
+            return res.badRequest(`Requested quantity exceeds available stock (${productExists.stock})`);
+        }
 
         const existingProduct = cart.products.find(p => p.product.toString() === pid);
 
@@ -156,6 +164,15 @@ export async function updateCart(req, res) {
             return res.badRequest('products must be a non-empty array');
         }
 
+        for (const item of products) {
+            if (!item.product || typeof item.product !== 'string' || !mongoose.Types.ObjectId.isValid(item.product)) {
+                return res.badRequest('Each item must include a valid product ID');
+            }
+            if (!item.quantity || typeof item.quantity !== 'number' || item.quantity <= 0) {
+                return res.badRequest('Each item must include a valid quantity greater than 0');
+            }
+        }
+
         const cart = await Cart.findById(id);
         if (!cart) return res.notFound('Cart not found');
 
@@ -190,7 +207,7 @@ export async function updateProductQuantity(req, res) {
         if (!product) return res.notFound('Product not found in database');
 
         if (quantity > product.stock) {
-            return res.conflict(`Not enough stock available, only ${product.stock} left`);
+            return res.badRequest(`Requested quantity exceeds available stock (${product.stock})`);
         }
 
         cart.products[productIndex].quantity = quantity;
@@ -204,7 +221,7 @@ export async function updateProductQuantity(req, res) {
 }
 
 export async function purchaseCart(req, res) {
-    
+
     try {
         const cartId = req.params.id;
 
@@ -222,7 +239,7 @@ export async function purchaseCart(req, res) {
         const productsPurchased = [];
 
         for (const item of cart.products) {
-            const { product, quantity }  = item;
+            const { product, quantity } = item;
 
             if (!product?._id || product.stock < quantity) {
                 productsNotPurchased.push(item);
@@ -247,7 +264,7 @@ export async function purchaseCart(req, res) {
         });
 
         await cart.save();
-        
+
         res.success('Purchase completed', {
             ticket,
             productsNotPurchased
