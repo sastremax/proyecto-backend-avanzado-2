@@ -1,6 +1,7 @@
 import Cart from '../models/Cart.model.js';
 import Product from '../models/Product.model.js';
 import TicketModel from '../models/Ticket.model.js';
+import mongoose from 'mongoose';
 
 export async function seedCarts(req, res) {
     try {
@@ -44,7 +45,7 @@ export async function getCartById(req, res) {
             select: 'title price description stock category thumbnails'
         });
 
-        if (!cart) return res.badRequest('Cart not found');
+        if (!cart) return res.notFound('Cart not found');
         res.success('Cart founded', cart);
     } catch (error) {
         console.log('Error getting cart by id:', error);
@@ -64,21 +65,29 @@ export async function createCart(req, res) {
 
 export async function addProductToCart(req, res) {
     try {
-        const { id, productId } = req.params;
-        const qty = Number.parseInt(req.body.quantity) > 0 ? Number.parseInt(req.body.quantity) : 1;
+        const { cid, pid } = req.params;
+        const quantity = Number.parseInt(req.body.quantity) > 0 ? Number.parseInt(req.body.quantity) : 1;
 
-        const cart = await Cart.findById(id);
-        if (!cart) return res.badRequest('Cart not found');
+        if (!mongoose.Types.ObjectId.isValid(cid)) {
+            return res.badRequest('Invalid cart ID format');
+        }
 
-        const productExists = await Product.findById(productId);
-        if (!productExists) return res.badRequest('Product not found');
+        if (!mongoose.Types.ObjectId.isValid(pid)) {
+            return res.badRequest('Invalid product ID format');
+        }
 
-        const existingProduct = cart.products.find(p => p.product.toString() === productId);
+        const cart = await Cart.findById(cid);
+        if (!cart) return res.notFound('Cart not found');
+
+        const productExists = await Product.findById(pid);
+        if (!productExists) return res.notFound('Product not found');
+
+        const existingProduct = cart.products.find(p => p.product.toString() === pid);
 
         if (existingProduct) {
-            existingProduct.quantity += qty;
+            existingProduct.quantity += quantity;
         } else {
-            cart.products.push({ product: productId, quantity: qty });
+            cart.products.push({ product: pid, quantity });
         }
 
         await cart.save();
@@ -94,11 +103,11 @@ export async function removeProductFromCart(req, res) {
         const { id, productId } = req.params;
 
         const cart = await Cart.findById(id);
-        if (!cart) return res.badRequest('Cart not found');
+        if (!cart) return res.notFound('Cart not found');
 
         const updatedProducts = cart.products.filter(p => p.product.toString() !== productId);
         if (updatedProducts.length === cart.products.length) {
-            return res.badRequest('Product not found in cart');
+            return res.notFound('Product not found in cart');
         }
 
         cart.products = updatedProducts;
@@ -114,7 +123,7 @@ export async function removeProductFromCart(req, res) {
 export async function clearCart(req, res) {
     try {
         const cart = await Cart.findById(req.params.id);
-        if (!cart) return res.badRequest('Cart not found');
+        if (!cart) return res.notFound('Cart not found');
 
         cart.products = [];
         await cart.save();
@@ -129,7 +138,7 @@ export async function clearCart(req, res) {
 export async function deleteCart(req, res) {
     try {
         const deletedCart = await Cart.findByIdAndDelete(req.params.id);
-        if (!deletedCart) return res.badRequest('Cart not found');
+        if (!deletedCart) return res.notFound('Cart not found');
 
         res.success('Cart deleted successfully');
     } catch (error) {
@@ -148,7 +157,7 @@ export async function updateCart(req, res) {
         }
 
         const cart = await Cart.findById(id);
-        if (!cart) return res.badRequest('Cart not found');
+        if (!cart) return res.notFound('Cart not found');
 
         cart.products = products;
         await cart.save();
@@ -170,18 +179,18 @@ export async function updateProductQuantity(req, res) {
         }
 
         const cart = await Cart.findById(id);
-        if (!cart) return res.badRequest('Cart not found');
+        if (!cart) return res.notFound('Cart not found');
 
         const productIndex = cart.products.findIndex(p => p.product.toString() === productId);
         if (productIndex === -1) {
-            return res.badRequest('Product not found in cart');
+            return res.notFound('Product not found in cart');
         }
 
         const product = await Product.findById(productId);
-        if (!product) return res.badRequest('Product not found in database');
+        if (!product) return res.notFound('Product not found in database');
 
         if (quantity > product.stock) {
-            return res.badRequest(`Not enough stock available, only ${product.stock} left`);
+            return res.conflict(`Not enough stock available, only ${product.stock} left`);
         }
 
         cart.products[productIndex].quantity = quantity;
@@ -205,7 +214,7 @@ export async function purchaseCart(req, res) {
         });
 
         if (!cart) {
-            return res.badRequest('Cart not found');
+            return res.notFound('Cart not found');
         }
 
         let totalAmount = 0;

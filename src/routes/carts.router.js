@@ -24,7 +24,7 @@ export default class CartsRouter extends CustomRouter {
         this.get('/:id', getCartById);
         this.post('/', createCart);
         this.post(
-            '/:id/products/:productId',
+            '/:cid/product/:pid',
             passportCall('current'),
             authorizationRole('user'),
             addProductToCart
