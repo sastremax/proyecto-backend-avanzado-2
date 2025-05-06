@@ -3,7 +3,9 @@ import config from '../config/config.js';
 import { UsersDTO } from '../dto/UsersDTO.js';
 import { UserManager } from '../dao/mongo/UserManager.js';
 import { sendRecoveryEmail } from '../utils/mailer.js';
-import { createHash, isValidPassword } from '../utils/hash.js';
+import { hashPassword, isValidPassword } from '../utils/hash.js';
+
+const userManager = new UserManager();
 
 export const githubCallback = (req, res) => {
     const user = req.user;
@@ -26,7 +28,7 @@ export const debugSession = (req, res) => {
 export class UsersController {
     async getUserByEmail(req, res) {
         const { email } = req.params;
-        const user = await UserManager.getByEmail(email);
+        const user = await userManager.getByEmail(email);
         const userDTO = new UsersDTO(user);
         res.json(userDTO);
     }
@@ -35,7 +37,7 @@ export class UsersController {
 export const getUserByEmail = async (req, res) => {
     const { email } = req.params;
     try {
-        const user = await UserManager.getByEmail(email);
+        const user = await userManager.getByEmail(email);
         if (!user) return res.notFound('User not found');
         const userDTO = new UsersDTO(user);
         res.success('User found', userDTO);
@@ -50,7 +52,7 @@ export const sendPasswordResetEmail = async (req, res) => {
     const { email } = req.body;
 
     try {
-        const user = await UserManager.getByEmail(email);
+        const user = await userManager.getByEmail(email);
         if (!user) return res.notFound('User not found');
 
         const token = jwt.sign(
@@ -88,13 +90,13 @@ export const resetPassword = async (req, res) => {
 
     try {
         const decoded = jwt.verify(token, config.jwt_secret);
-        const user = await UserManager.getByEmail(decoded.email);
+        const user = await userManager.getByEmail(decoded.email);
         if (!user) return res.notFound('User not found');
 
-        const samePassword = isValidPassword(user, password);
+        const samePassword = isValidPassword(password, user.password);
         if (samePassword) return res.badRequest('Password must be different from the previous one');
 
-        const hashedPassword = createHash(password);
+        const hashedPassword = hashPassword(password);
         user.password = hashedPassword;
         await user.save();
 

@@ -21,8 +21,6 @@ export default class UsersRouter extends CustomRouter {
             githubCallback
         );
 
-        this.get('/:email', getUserByEmail);
-
         this.get('/debug/session', debugSession);
 
         this.get('/reset-password', [], validateResetToken);
@@ -30,5 +28,7 @@ export default class UsersRouter extends CustomRouter {
         this.post('/reset-password-request', [], sendPasswordResetEmail);
 
         this.post('/reset-password', [], resetPassword);
+
+        this.get('/:email', getUserByEmail);
     }
 }
