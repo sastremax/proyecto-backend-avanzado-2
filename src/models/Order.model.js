@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-const orderSchema = new mongoose.Schema({
+export const orderSchema = new mongoose.Schema({
     business: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Business',
