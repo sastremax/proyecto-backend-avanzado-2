@@ -2,6 +2,8 @@ import jwt from 'jsonwebtoken';
 import config from '../config/config.js';
 import { UsersDTO } from '../dto/UsersDTO.js';
 import { UserManager } from '../dao/mongo/UserManager.js';
+import { sendRecoveryEmail } from '../utils/mailer.js';
+import { createHash, isValidPassword } from '../utils/hash.js';
 
 export const githubCallback = (req, res) => {
     const user = req.user;
@@ -28,7 +30,7 @@ export class UsersController {
         const userDTO = new UsersDTO(user);
         res.json(userDTO);
     }
-}
+};
 
 export const getUserByEmail = async (req, res) => {
     const { email } = req.params;
@@ -41,4 +43,64 @@ export const getUserByEmail = async (req, res) => {
         console.error('Error getting user by email:', error);
         res.internalError('Error getting user by email');
     }
+};
+
+export const sendPasswordResetEmail = async (req, res) => {
+
+    const { email } = req.body;
+
+    try {
+        const user = await UserManager.getByEmail(email);
+        if (!user) return res.notFound('User not found');
+
+        const token = jwt.sign(
+            { email },
+            config.jwt_secret,
+            { expiresIn: '1h' }
+        );
+
+        await sendRecoveryEmail(email, token);
+
+        res.success('Recovery email sent');
+    } catch (error) {
+        console.error('Error sending recovery email:', error);
+        res.internalError('Failed to send recovery email');
+    }
+
+};
+
+export const validateResetToken = (req, res) => {
+
+    const { token } = req.query;
+
+    try {
+        const decoded = jwt.verify(token, config.jwt_secret);
+        res.success('Token is valid', { email: decoded.email });
+    } catch {
+        res.unauthorized('Invalid or expired token');
+    }
+
+};
+
+export const resetPassword = async (req, res) => {
+
+    const { token, password } = req.body;
+
+    try {
+        const decoded = jwt.verify(token, config.jwt_secret);
+        const user = await UserManager.getByEmail(decoded.email);
+        if (!user) return res.notFound('User not found');
+
+        const samePassword = isValidPassword(user, password);
+        if (samePassword) return res.badRequest('Password must be different from the previous one');
+
+        const hashedPassword = createHash(password);
+        user.password = hashedPassword;
+        await user.save();
+
+        res.success('Password reset successful');
+    } catch {
+        res.unauthorized('Invalid or expired token');
+    }
+
 };

@@ -9,7 +9,9 @@ const config = {
     github_client_id: process.env.GITHUB_CLIENT_ID,
     github_client_secret: process.env.GITHUB_CLIENT_SECRET,
     mongo_uri: process.env.MONGO_URI,
-    persistence: process.env.PERSISTENCE
+    persistence: process.env.PERSISTENCE,
+    mail_user: process.env.MAIL_USER,
+    mail_pass: process.env.MAIL_PASS
 };
 
 export default config;
