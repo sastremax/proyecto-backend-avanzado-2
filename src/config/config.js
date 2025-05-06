@@ -11,7 +11,10 @@ const config = {
     mongo_uri: process.env.MONGO_URI,
     persistence: process.env.PERSISTENCE,
     mail_user: process.env.MAIL_USER,
-    mail_pass: process.env.MAIL_PASS
+    mail_pass: process.env.MAIL_PASS,
+    twilio_sid: process.env.TWILIO_SID,
+    twilio_token: process.env.TWILIO_TOKEN,
+    whatsapp_dest: process.env.WHATSAPP_DEST
 };
 
 export default config;

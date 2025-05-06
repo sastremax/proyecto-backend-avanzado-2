@@ -2,6 +2,8 @@ import Cart from '../models/Cart.model.js';
 import Product from '../models/Product.model.js';
 import TicketModel from '../models/Ticket.model.js';
 import mongoose from 'mongoose';
+import { sendWhatsAppMessage } from '../utils/twilio.js';
+import config from '../config/config.js';
 
 export async function seedCarts(req, res) {
     try {
@@ -113,7 +115,7 @@ export async function removeProductFromCart(req, res) {
         if (!mongoose.Types.ObjectId.isValid(id)) {
             return res.badRequest('Invalid cart ID format');
         }
-        
+
         const cart = await Cart.findById(id);
         if (!cart) return res.notFound('Cart not found');
 
@@ -267,6 +269,12 @@ export async function purchaseCart(req, res) {
             purchaser: req.user.email
         });
 
+        console.log('sending WHATSAPP with total:', totalAmount);
+        await sendWhatsAppMessage(
+            config.whatsapp_dest,
+            `Hello ${req.user.first_name}, your purchase was confirmed. Total amount: $${totalAmount}`
+        );
+        console.log('WHATSAPP MESSAGE SENT');
         cart.products = cart.products.filter(item => {
             const id = item.product?._id?.toString();
             return !productsPurchased.includes(id);
