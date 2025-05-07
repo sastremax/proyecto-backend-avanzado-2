@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 
 const businessSchema = new mongoose.Schema({
+
     name: {
         type: String,
         required: true
@@ -8,9 +9,14 @@ const businessSchema = new mongoose.Schema({
     address: {
         type: String,
         required: true
-    }
-}, {
-    timestamps: true
+    },
+    products: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Product'
+        }
+    ]
+
 });
 
 export const BusinessModel = mongoose.model('Business', businessSchema);

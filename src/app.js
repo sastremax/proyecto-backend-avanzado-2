@@ -12,6 +12,7 @@ import CartsRouter from './routes/carts.router.js';
 import errorHandler from './middlewares/errorHandler.middleware.js';
 import config from './config/config.js';
 import customResponses from './middlewares/customResponses.middleware.js';
+import BusinessRouter from './routes/BusinessRouter.js';
 import OrdersRouter from './routes/OrdersRouter.js';
 
 const app = express()
@@ -39,6 +40,7 @@ app.use('/api/sessions', new SessionsRouter().getRouter());
 app.use('/api/products', new ProductsRouter().getRouter());
 app.use('/api/carts', new CartsRouter().getRouter());
 app.use('/base', new BaseRouter().getRouter());
+app.use('/api/business', new BusinessRouter().getRouter());
 app.use('/api/orders', new OrdersRouter().getRouter());
 app.use(errorHandler);
 
