@@ -21,7 +21,7 @@ TWILIO_SID=
 TWILIO_TOKEN=
 WHATSAPP_DEST=
 
-nstalación y Configuración
+Instalación y Configuración
 Paso 1: Clonar el repositorio
 git clone https://github.com/tuusuario/proyecto-backend-avanzado-2.git
 cd proyecto-backend-avanzado-2
