@@ -58,9 +58,8 @@ export async function createOrder(req, res) {
     } catch (error) {
         if (userErrorMessage) {
             return res.badRequest(userErrorMessage);
-        }
-        console.error('Error creating order:', error);
-        return res.internalError('Unexpected error during order creation');
+        }        
+        return res.internalError('Unexpected error during order creation', error);
     } finally {
         session.endSession();
     }
@@ -73,8 +72,7 @@ export async function getAllOrders(req, res) {
         const orders = await OrderModel.find().populate('user').populate('business').populate('products.product');
         res.success('Orders retrieved', orders);
     } catch (error) {
-        console.error('Error fetching orders:', error);
-        res.internalError('Error retrieving orders');
+        res.internalError('Error retrieving orders', error);
     }
 
 }

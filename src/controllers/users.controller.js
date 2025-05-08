@@ -42,8 +42,7 @@ export const getUserByEmail = async (req, res) => {
         const userDTO = new UsersDTO(user);
         res.success('User found', userDTO);
     } catch (error) {
-        console.error('Error getting user by email:', error);
-        res.internalError('Error getting user by email');
+        return res.internalError('Error getting user by email', error);
     }
 };
 
@@ -65,8 +64,7 @@ export const sendPasswordResetEmail = async (req, res) => {
 
         res.success('Recovery email sent');
     } catch (error) {
-        console.error('Error sending recovery email:', error);
-        res.internalError('Failed to send recovery email');
+        return res.internalError('Failed to send recovery email', error);
     }
 
 };

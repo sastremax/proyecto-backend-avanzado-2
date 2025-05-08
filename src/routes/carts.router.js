@@ -1,7 +1,6 @@
 import CustomRouter from './CustomRouter.js';
 import {
     getCartById,
-    seedCarts,
     createCart,
     addProductToCart,
     clearCart,
@@ -13,12 +12,9 @@ import {
 } from '../controllers/carts.controller.js';
 import passportCall from '../middlewares/passportCall.middleware.js';
 import { authorizationRole } from '../middlewares/auth.middleware.js';
-import { addTimestamp } from '../middlewares/logger.middleware.js';
 
 export default class CartsRouter extends CustomRouter {
-    init() {
-        // logger a nivel de router
-        this.router.use(addTimestamp);
+    init() {        
 
         // rutas de carrito
         this.get('/:id', getCartById);

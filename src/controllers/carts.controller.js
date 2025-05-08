@@ -5,41 +5,6 @@ import mongoose from 'mongoose';
 import { sendWhatsAppMessage } from '../utils/twilio.js';
 import config from '../config/config.js';
 
-export async function seedCarts(req, res) {
-    try {
-        const products = await Product.find();
-        if (products.length < 5) {
-            return res.badRequest('Not enough products to create carts');
-        }
-
-        const carts = [
-            {
-                products: [
-                    { product: products[0]._id, quantity: 2 },
-                    { product: products[1]._id, quantity: 1 }
-                ]
-            },
-            {
-                products: [
-                    { product: products[2]._id, quantity: 3 },
-                    { product: products[3]._id, quantity: 1 }
-                ]
-            },
-            {
-                products: [
-                    { product: products[4]._id, quantity: 5 }
-                ]
-            }
-        ];
-
-        await Cart.insertMany(carts);
-        res.created('Sample carts added successfully');
-    } catch (error) {
-        console.error('Error inserting sample carts:', error);
-        res.internalError('Error inserting sample carts');
-    }
-}
-
 export async function getCartById(req, res) {
     try {
         const cart = await Cart.findById(req.params.id).populate({
@@ -50,8 +15,7 @@ export async function getCartById(req, res) {
         if (!cart) return res.notFound('Cart not found');
         res.success('Cart founded', cart);
     } catch (error) {
-        console.log('Error getting cart by id:', error);
-        res.internalError('Error getting cart by id');
+        return res.internalError('Error getting cart by id', error);
     }
 }
 
@@ -60,8 +24,7 @@ export async function createCart(req, res) {
         const newCart = await Cart.create({ products: [] });
         res.created('Cart created successfully', newCart);
     } catch (error) {
-        console.log('Error creating cart:', error);
-        res.internalError('Error creating cart');
+        return res.internalError('Error creating cart', error);
     }
 }
 
@@ -103,8 +66,7 @@ export async function addProductToCart(req, res) {
         await cart.save();
         res.success('Product added successfully', cart);
     } catch (error) {
-        console.log('Error adding product to cart:', error);
-        res.internalError('Error adding product to cart');
+        return res.internalError('Error adding product to cart', error);
     }
 }
 
@@ -129,8 +91,7 @@ export async function removeProductFromCart(req, res) {
 
         res.success('Product removed from cart', cart);
     } catch (error) {
-        console.log('Error removing product from cart:', error);
-        res.internalError('Error removing product from cart');
+        return res.internalError('Error removing product from cart', error);
     }
 }
 
@@ -149,8 +110,7 @@ export async function clearCart(req, res) {
 
         res.success('Cart cleared successfully', cart);
     } catch (error) {
-        console.log('Error clearing cart:', error);
-        res.internalError('Error clearing cart');
+        return res.internalError('Error clearing cart', error);
     }
 }
 
@@ -161,8 +121,7 @@ export async function deleteCart(req, res) {
 
         res.success('Cart deleted successfully');
     } catch (error) {
-        console.log('Error deleting cart:', error);
-        res.internalError('Error deleting cart');
+        return res.internalError('Error deleting cart', error);
     }
 }
 
@@ -192,8 +151,7 @@ export async function updateCart(req, res) {
 
         res.success('Cart updated successfully', cart);
     } catch (error) {
-        console.log('Error updating cart:', error);
-        res.internalError('Error updating cart');
+        return res.internalError('Error updating cart', error);
     }
 }
 
@@ -226,8 +184,7 @@ export async function updateProductQuantity(req, res) {
 
         res.success('Product quantity updated', cart);
     } catch (error) {
-        console.log('Error updating product quantity:', error);
-        res.internalError('Error updating product quantity');
+        return res.internalError('Error updating product quantity', error);
     }
 }
 
@@ -269,12 +226,10 @@ export async function purchaseCart(req, res) {
             purchaser: req.user.email
         });
 
-        console.log('sending WHATSAPP with total:', totalAmount);
         await sendWhatsAppMessage(
             config.whatsapp_dest,
             `Hello ${req.user.first_name}, your purchase was confirmed. Total amount: $${totalAmount}`
         );
-        console.log('WHATSAPP MESSAGE SENT');
         cart.products = cart.products.filter(item => {
             const id = item.product?._id?.toString();
             return !productsPurchased.includes(id);
@@ -288,8 +243,7 @@ export async function purchaseCart(req, res) {
         });
 
     } catch (error) {
-        console.error('Error in purchaseCart:', error);
-        res.internalError('Error processing cart purchase');
+        return res.internalError('Error processing cart purchase', error);
     }
 
 }

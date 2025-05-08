@@ -18,6 +18,16 @@ import OrdersRouter from './routes/OrdersRouter.js';
 const app = express()
 const PORT = config.port;
 
+process.on('uncaughtException', (error) => {
+    console.error('UNCAUGHT EXCEPTION:', error.message);
+    process.exit(1);
+});
+
+process.on('unhandledRejection', (reason) => {
+    console.error('UNHANDLED REJECTION:', reason);
+    process.exit(1);
+});
+
 app.use(express.json());
 app.use(customResponses);
 app.use(express.urlencoded({ extended: true }));
@@ -46,9 +56,7 @@ app.use(errorHandler);
 
 const startServer = async () => {
     await connectToDB()
-    app.listen(PORT, () => {
-        console.log(`Server running on port ${PORT}`)
-    })
+    app.listen(PORT)
 }
 
 startServer();

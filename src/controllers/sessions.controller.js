@@ -22,7 +22,6 @@ export const loginSession = (req, res, next) => {
         res.cookie('jwtToken', token, { httpOnly: true });
         res.success('Login successful', { token, user: dtoUser });
     } catch (error) {
-        console.error('Error during login session:', error);
         next(error);
     }
 };
@@ -42,19 +41,42 @@ export const registerSession = async (req, res, next) => {
         res.created('User registered successfully');
 
     } catch (error) {
-        console.error('Error during registration session:', error);
         next(error);
     }
 
 };
 
 export const currentSession = (req, res) => {
-    console.log('[DEBUG] req.user recibido en /current:', req.user);
+
     const dtoUser = new UsersDTO(req.user);
     res.success('Current user', dtoUser);
+    
 };
 
 export const logoutSession = (req, res) => {
     res.clearCookie('jwtToken');
     res.success('Logout successful');
+};
+
+export const forgotPassword = async (req, res) => {
+
+    try {
+        const { email } = req.body;
+
+        if (!email) return res.badRequest('Email is required.');
+
+        const user = await userService.getByEmail(email);
+        if (!user) return res.notFound('User not found.');
+
+        const token = jwt.sign({ email }, config.jwt_secret, { expiresIn: '1h' });
+
+        const recoveryLink = `http://localhost:8080/api/sessions/reset-password?token=${token}`;
+
+        await sendRecoveryEmail(email, recoveryLink);
+
+        return res.success('Recovery email sent successfully.');
+    } catch (error) {
+        return res.internalError('Error sending recovery email', error);
+    }
+    
 };

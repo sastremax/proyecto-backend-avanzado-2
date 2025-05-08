@@ -122,7 +122,6 @@ const initializePassport = () => {
         async (jwtPayload, done) => {
             try {
                 const user = await userManager.getById(jwtPayload.id);
-                console.log('[DEBUG]:', user);
                 if (!user) return done(null, false, { message: 'User not found' });
                 return done(null, {
                     id: user._id,

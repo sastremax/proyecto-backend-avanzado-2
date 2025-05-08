@@ -31,8 +31,7 @@ export function handlePolicies(policies = []) {
 
             next();
         } catch (error) {
-            console.error('handlePolicies error:', error);
-            res.internalError('Authorization failed');
+            return res.internalError('Authorization failed', error);
         }
     };
 }
