@@ -1,143 +1,102 @@
-Backend 2 - Primera Preentrega
-
+Backend II - Proyecto Final
 Descripción del Proyecto
-
-Este proyecto corresponde a la primera preentrega del curso Backend. Implementa un sistema completo de autenticación con Passport utilizando estrategias locales y de terceros (GitHub), middleware de roles, protección de rutas con JWT y manejo de sesiones mediante cookies. Las vistas están renderizadas con Handlebars y los datos se almacenan en MongoDB.
+Este proyecto corresponde a la entrega final del curso Backend II. Consiste en un sistema robusto y modularizado para un e-commerce, con implementación completa de autenticación, autorización por roles, gestión de productos y carritos, sistema de tickets, recuperación de contraseña por email, y arquitectura en capas aplicando DAO, Repositorio, DTO y Middlewares.
 
 Requisitos
-
-Node.js: Versión 16.x o superior
-
-Express: Framework para el servidor web
+Node.js: 16.x o superior
 
 MongoDB: Base de datos NoSQL (local o Atlas)
 
-Passport: Autenticación local y con GitHub
+Postman: Para pruebas manuales
 
-bcrypt: Hasheo de contraseñas
+Variables de entorno necesarias:
 
-jsonwebtoken: Generación y verificación de tokens JWT
+PORT=
+MONGO_URI=
+SECRET_KEY=
+JWT_SECRET=
+MAIL_USER=
+MAIL_PASS=
+TWILIO_SID=
+TWILIO_TOKEN=
+WHATSAPP_DEST=
 
-cookie-parser: Lectura de cookies HTTP
-
-express-session: Manejo de sesiones
-
-dotenv: Variables de entorno
-
-express-handlebars: Motor de vistas
-
-Instalación y Configuración
-
+nstalación y Configuración
 Paso 1: Clonar el repositorio
-
-git clone https://github.com/tuusuario/proyecto-backend-avanzado.git
-cd proyecto-backend-avanzado
+git clone https://github.com/tuusuario/proyecto-backend-avanzado-2.git
+cd proyecto-backend-avanzado-2
 
 Paso 2: Instalar las dependencias
-
 npm install
 
-Paso 3: Crear el archivo .env
+Paso 3: Configurar .env con tus variables
 
-con estos datos: 
-SECRET_KEY
-JWT_SECRET
-GITHUB_CLIENT_ID
-GITHUB_CLIENT_SECRET
-MONGO_URI
-
-Uso del Proyecto
-
-Ejecutar el Servidor
-
+Ejecución del Proyecto
 npm run dev
-
-Esto inicia el servidor en: http://localhost:8080
 
 Funcionalidades Principales
 
-1. Registro de Usuarios
+Registro de Usuarios
+POST /api/sessions/register
+Crea un usuario nuevo y le asigna automáticamente un carrito.
 
-Ruta: POST /api/sessions/register
+Login
+POST /api/sessions/login
+Autentica al usuario y genera un JWT que se guarda como cookie segura.
 
-Cuerpo:
+Sesión Actual
+GET /api/sessions/current
+Devuelve los datos del usuario logueado (DTO, sin contraseña).
 
-{
-  "first_name": "Juan",
-  "last_name": "Pérez",
-  "email": "juan@example.com",
-  "age": 30,
-  "password": "clave123456"
-}
+Recuperación de Contraseña
+POST /api/sessions/forgot-password
+Envía un email con un link temporal para cambiar la contraseña.
 
-2. Login Local
+POST /api/sessions/reset-password?token=...
+Permite establecer una nueva contraseña (no puede ser la misma anterior).
 
-Ruta: POST /api/sessions/login
+Gestión de Carritos
+POST /api/carts
+GET /api/carts/:cid
+POST /api/carts/:cid/product/:pid
+PUT /api/carts/:cid/products
+PUT /api/carts/:cid/products/:pid
+DELETE /api/carts/:cid/products/:pid
+POST /api/carts/:cid/purchase → Crea ticket, descuenta stock y envía WhatsApp
 
-Genera un JWT y lo guarda en una cookie llamada jwtToken
+Gestión de Productos
+GET /api/products
+GET /api/products/:id
+POST /api/products (solo admin)
+PUT /api/products/:id (solo admin)
+DELETE /api/products/:id (solo admin)
 
-3. Login con GitHub
+Arquitectura Aplicada
+DAO: Acceso directo a modelos a través de managers (UserManager, CartManager, etc.)
 
-Ruta: GET /api/users/github
+Repository: Capa intermedia que abstrae la lógica de persistencia (UserRepository, etc.)
 
-Autenticación usando GitHub con creación automática del usuario
+Service: Lógica de negocio desacoplada de Express (UserService, etc.)
 
-4. Ruta Protegida con JWT
+DTO: Respuesta estandarizada en rutas sensibles (UsersDTO, ProductsDTO)
 
-Ruta: GET /api/sessions/current
+Middlewares: Autenticación, autorización por rol, validación de datos y manejo global de errores.
 
-Devuelve los datos del usuario logueado si el token JWT es válido
+JWT + Cookies: Manejo de sesión sin almacenamiento en servidor.
 
-5. Logout
-
-Ruta: GET /api/sessions/logout
-
-Elimina la cookie y cierra sesión
-
-6. Vista Protegida con Rol Admin
-
-Ruta: GET /api/users/products
-
-Protegida por passport.authenticate('current') y authorizationRole('admin').
-
-Renderiza products.handlebars con los datos del usuario
-
-7. Formularios Visuales
-
-GET /api/users/login/form → Vista para loguearse
-
-GET /api/users/register → Vista para registrarse
-
-Middleware Aplicados
-
-passport.authenticate('current') → Verifica el token JWT desde  cookies
-
-authorizationRole(rol) → Verifica si el usuario tiene el rol requerido (por defecto cualquier rol)
-
-Pruebas
-
-Con Postman
-
+Pruebas con Postman
 Registro: POST /api/sessions/register
 
 Login: POST /api/sessions/login
 
-Current: GET /api/sessions/current (requiere cookie jwtToken)
+Current: GET /api/sessions/current
 
-Desde el Navegador
+Recuperación de contraseña: POST /api/sessions/forgot-password
 
-Ir a /api/users/register y crear un usuario
-
-Ir a /api/users/login/form y hacer login
-
-Redirige automáticamente a /api/users/products si el usuario es admin
-
-Si no es admin, devuelve "Access Denied"
+Productos y carritos: todas las rutas documentadas están listas para ser testeadas.
 
 Consideraciones Finales
-
-Este proyecto sienta las bases de un sistema seguro de autenticación en aplicaciones backend modernas, usando JWT, Passport y roles. Está listo para integrarse con rutas de usuarios, carritos, productos o cualquier módulo adicional que se requiera.
+Este proyecto refleja una arquitectura backend moderna, escalable y segura, con separación clara de responsabilidades y herramientas profesionales de autenticación, persistencia, y comunicación.
 
 Autor
-
 Maximiliano Sastre Bocalon
