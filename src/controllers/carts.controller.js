@@ -220,6 +220,12 @@ export async function purchaseCart(req, res) {
             productsPurchased.push(product._id.toString());
         }
 
+        if (productsPurchased.length === 0) {
+            return res.success('No products were purchased', {
+                productsNotPurchased
+            });
+        }
+
         const ticket = await TicketModel.create({
             code: Date.now().toString(),
             amount: totalAmount,
